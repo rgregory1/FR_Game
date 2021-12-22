@@ -1,6 +1,5 @@
-// const HOME_SHEET = "1Ng8ms_c8RuyGIXDSJgvejJUldFsp_17-rPFGY3WGeok";
-const HOME_SHEET = "1t5I_Dlq56evtY3VHrauXb0KIaHNWZ_bmVvV6lmcS3Uo";
-const ss = SpreadsheetApp.openById(HOME_SHEET);
+
+const ss = SpreadsheetApp.getActive()
 const baseGameInfo = ss.getSheetByName("baseGameInfo");
 const db = ss.getSheetByName('db')
 const track = ss.getSheetByName('Track')
@@ -8,6 +7,12 @@ const track = ss.getSheetByName('Track')
 const gameApiLink = baseGameInfo.getRange('B9').getValue()  // deployed game
 // const gameApiLink = baseGameInfo.getRange('B10').getValue()  // dev game
 
+function onOpen(){
+  let ui = SpreadsheetApp.getUi()
+   ui.createMenu('Play FR')
+    .addItem('Choose Starting Position', 'emailNextTeam')
+    .addToUi()
+}
 
 // // get parent folder id
 // const spreadSheetFile = DriveApp.getFileById(HOME_SHEET);
@@ -17,7 +22,7 @@ const gameApiLink = baseGameInfo.getRange('B9').getValue()  // deployed game
  * builds decs from the listed decs on lines 12,13 of the base sheet
  */
 function buildDecks() {
-  let deckData = baseGameInfo.getRange(12, 1, 2, 17).getValues();
+  let deckData = baseGameInfo.getRange(21, 1, 2, 17).getValues();
   // console.log(deckData);
 
   let decks = [];
@@ -69,4 +74,6 @@ function setUpGame() {
     // add initial data to db
     db.appendRow([team[1], -1, 0, "", "", deckString]);
   });
+
+   baseGameInfo.getRange('B11').setValue(-1)
 }

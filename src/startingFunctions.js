@@ -58,7 +58,7 @@ function sendStartingPos(parameter = {sprinter: 8,roller: 5, teamColor: 'Black'}
   SpreadsheetApp.flush();
 
   // increase turn count so they won't be choosing stating positions next time
-  incrementTurn(parameter.teamColor)
+  incrementPlayerTurn(parameter.teamColor)
 
   emailNextTeam()
 
@@ -85,7 +85,7 @@ function emailNextTeam(){
     // get random player
     let nextPlayer = possiblePlayers[random]
 
-    let body = `Congratulations ${nextPlayer.team} Team!
+    let body = `<h2>Congratulations ${nextPlayer.team} Team!</h2>
     
     It's your turn to pick your starting positions
     
@@ -100,6 +100,8 @@ function emailNextTeam(){
         htmlBody: body
       })
   } else {
+
+    initiatNewTurn()
     console.log('begin the game')
   }
 
@@ -114,7 +116,7 @@ function emailNextTeam(){
 /**
  * incriments the turn number for current player
  */
-function incrementTurn(team='Black'){
+function incrementPlayerTurn(team='Black'){
 
    let playerData = findLastMove(team)
 

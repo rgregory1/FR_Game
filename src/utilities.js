@@ -71,8 +71,14 @@ function getDbData() {
   return dbData
 }
 
+function increaseGameTurn(){
+  let currentTurn = getCurrentGameTurn()
+  baseGameInfo.getRange('B11').setValue(currentTurn + 1)
+}
 
-
+function getCurrentGameTurn(){
+  return baseGameInfo.getRange('B11').getValue()
+}
 
 
 
