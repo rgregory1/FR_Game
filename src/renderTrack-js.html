@@ -1,0 +1,39 @@
+<script>
+
+  document.addEventListener("DOMContentLoaded", function(){
+    google.script.run.withSuccessHandler(generateTable).getTrackData()
+    
+  })
+
+  function generateTable(dataArray){
+    
+    var tbody = document.getElementById("table-body")
+    while (tbody.hasChildNodes()) {
+      tbody.removeChild(tbody.firstChild);
+    }
+
+
+    dataArray.forEach(line =>{
+      var row = document.createElement("tr")
+
+      line.forEach(cellSting => {
+
+        cell = cellSting.split("-")
+        var col = document.createElement("td")
+        if(cell[0] == 'B'){
+          col.className = 'table-success'
+        } else if(cell[0] == 'S' || cell[0] == 'F'){
+          col.className = 'table-warning border border-white'
+        } else if(cell[0] == 'R'){
+          col.className = 'table-secondary border border-white'
+        }
+        col.textContent = cell[1]
+        row.appendChild(col)
+      })
+      
+      
+      tbody.appendChild(row)
+    })
+  }
+
+</script>
