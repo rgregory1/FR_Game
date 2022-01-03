@@ -15,14 +15,14 @@ function testForNewTurn() {
   let stillToPlay = playerData.filter(x => x.turn == currentGameTurn)
 
   if(stillToPlay.length == 0){
-    initiatNewTurn()
+    initiatGameTurn()
   }else {
     console.log('still wating for players')
   }
 }
 
 
-function initiatNewTurn() {
+function initiatGameTurn() {
   
   // add one to game turn
   increaseGameTurn()

@@ -4,8 +4,8 @@ const baseGameInfo = ss.getSheetByName("baseGameInfo");
 const db = ss.getSheetByName('db')
 const track = ss.getSheetByName('Track')
 
-const gameApiLink = baseGameInfo.getRange('B9').getValue()  // deployed game
-// const gameApiLink = baseGameInfo.getRange('B10').getValue()  // dev game
+// const gameApiLink = baseGameInfo.getRange('B9').getValue()  // deployed game
+const gameApiLink = baseGameInfo.getRange('B10').getValue()  // dev game
 
 function onOpen(){
   let ui = SpreadsheetApp.getUi()
@@ -31,7 +31,7 @@ function buildDecks() {
     let deck = {
       name: line.shift(),
       energyDeck: [],
-      hand: [],
+      recycle: [],
       discard: [],
     };
 
@@ -72,8 +72,11 @@ function setUpGame() {
     let deckString = JSON.stringify(decks);
 
     // add initial data to db
-    db.appendRow([team[1], -1, 0, "", "", deckString]);
+    db.appendRow([team[1], -1, 0, JSON.stringify({}), JSON.stringify([]), deckString]);
   });
 
+  // set game turn to -1
    baseGameInfo.getRange('B11').setValue(-1)
+
+  emailNextTeam()
 }

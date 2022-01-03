@@ -43,7 +43,7 @@ function shuffleDeck(deck) {
   return deck;
 }
 
-function findLastMove(team) {
+function findLastMove(team='Blue') {
 
   let dbData = getDbData()
   let reversedDbData =dbData.reverse();
@@ -51,14 +51,14 @@ function findLastMove(team) {
     return each[0] == team;
   });
 
-  console.log(lastMove)
+  // console.log(lastMove)
 
   let lastMoveObj ={
     team: lastMove[0],
     turn: lastMove[1],
     phase: lastMove[2],
-    hand: lastMove[3],
-    choice: lastMove[4],
+    hand: JSON.parse(lastMove[3]),
+    choice: JSON.parse(lastMove[4]),
     deck: JSON.parse(lastMove[5]),
   }
   return lastMoveObj
@@ -80,6 +80,10 @@ function getCurrentGameTurn(){
   return baseGameInfo.getRange('B11').getValue()
 }
 
+function getApiUrl(){
+  let apiLink = ScriptApp.getService().getUrl()
+  console.log(apiLink)
+}
 
 
 

@@ -33,7 +33,7 @@ function returnPossiblePositions() {
 /**
  *  takes the parameters and adds the riders to the track
  */
-function sendStartingPos(parameter = {sprinter: 8,roller: 5, teamColor: 'Black'}) {
+function sendStartingPos(parameter = {sprinter: 1,roller: 3, teamColor: 'Black'}) {
   // console.log('from the app: ',parameter.roller)
   // console.log('from the app: ',parameter.sprinter)
 
@@ -84,6 +84,7 @@ function emailNextTeam(){
 
     // get random player
     let nextPlayer = possiblePlayers[random]
+    // let apiLink = ScriptApp.getService().getUrl()
 
     let body = `<h2>Congratulations ${nextPlayer.team} Team!</h2>
     
@@ -101,7 +102,7 @@ function emailNextTeam(){
       })
   } else {
 
-    initiatNewTurn()
+    initiatGameTurn()
     console.log('begin the game')
   }
 
@@ -127,8 +128,8 @@ function incrementPlayerTurn(team='Black'){
      playerData.team,
      playerData.turn,
      playerData.phase,
-     playerData.hand,
-     playerData.choice,
+     JSON.stringify(playerData.hand),
+     JSON.stringify(playerData.choice),
      JSON.stringify(playerData.deck)
    ])
 

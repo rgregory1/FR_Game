@@ -36,3 +36,19 @@ function getObject(){
   console.log(theObject.name);
 
 }
+
+
+function jsonifyEmptyString(){
+
+  let empty = JSON.stringify('')
+
+  
+
+  console.log(empty)
+
+}
+
+
+
+
+
