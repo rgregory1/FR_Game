@@ -10,7 +10,8 @@ const gameApiLink = baseGameInfo.getRange('B10').getValue()  // dev game
 function onOpen(){
   let ui = SpreadsheetApp.getUi()
    ui.createMenu('Play FR')
-    .addItem('Choose Starting Position', 'emailNextTeam')
+    .addItem('Setup Game', 'setUpGame')
+    .addItem('Reset Turn', 'resetGameTurn')
     .addToUi()
 }
 
@@ -80,3 +81,25 @@ function setUpGame() {
 
   emailNextTeam()
 }
+
+function resetGameTurn(){
+
+  let trackRestore = ss.getSheetByName('trackRestore').getDataRange().getValues()
+  let dbRestore = ss.getSheetByName('dbRestore').getDataRange().getValues()
+
+  track.clearContents()
+  track.getRange(1,1,trackRestore.length, trackRestore[0].length).setValues(trackRestore)
+
+  db.clearContents()
+  db.getRange(1,1, dbRestore.length, dbRestore[0].length).setValues(dbRestore)
+
+}
+
+
+
+
+
+
+
+
+

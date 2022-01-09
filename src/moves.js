@@ -1,3 +1,152 @@
+function draftPhase(){
+
+  // get track data from spreadsheet
+  let trackData = track.getDataRange().getValues()
+
+  // get array of arrays with only the riders marked on it
+  let positionData = getPositionData(trackData)
+
+  let playerData = getPlayerData()
+
+  // gather xy data for each rider
+  let currentPositions = []
+
+  playerData.forEach(player => {
+
+    let roller = player.team + 'Roller'
+
+    let rollerPosition = getRiderXY(roller, positionData)
+
+    currentPositions.push(rollerPosition)
+
+    let sprinter = player.team + 'Sprinter'
+
+    let sprinterPosition = getRiderXY(sprinter, positionData)
+
+    currentPositions.push(sprinterPosition)
+
+  })
+
+
+   // sort so upper lines are first in list, to establish left and right lane heirarchy
+  currentPositions.sort((firstItem, secondItem) => firstItem.y - secondItem.y)
+  // sort so lead riders are first in list
+  currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
+  currentPositions.reverse()
+
+  // // begin testing for drafting
+  // let thisGuy = {
+  //   rider: 'GreenSprinter',
+  //   x: 5,
+  //   y: 2
+  // }
+
+  let drafting = true
+  
+
+  while(drafting){
+
+    let draftCount = 0
+
+    currentPositions.forEach(thisGuy => {
+      let draftBlockers = ['I','C']
+
+      // test current square for Incline or Cobbles
+      let thisCell = trackData[thisGuy.y][thisGuy.x]
+      let isClear = draftBlockers.indexOf(thisCell.split('-')[0]) == -1
+      if(isClear) {
+        console.log('the riders space is clear')
+      }
+
+      // -------------------------  test if next square is empty
+      let nextCells = []
+      let nextCellx = thisGuy.x + 1
+      let isNextCellClear
+
+      for (let i = 0; i < trackData.length; i++){
+        let nextCell = trackData[i][nextCellx]
+        let nextCellData = nextCell.split("-")
+
+        let isNextClear = draftBlockers.indexOf(nextCellData[0]) == -1
+
+        if(nextCellData[0] == 'B'){
+          console.log('border')
+        } else if(isNextClear && nextCellData[1] == ''){
+          console.log('clear cell')
+          isNextCellClear = true
+        } else {
+          console.log('blocked')
+          isNextCellClear = false
+        }
+          
+
+      }
+
+      // -------------------------  test if square + 2 is empty
+      let twoCells = []
+      let twoCellx = thisGuy.x + 2
+      let isTwoCellOccupied
+
+      for (let i = 0; i < trackData.length; i++){
+        let twoCell = trackData[i][twoCellx]
+        let twoCellData = twoCell.split("-")
+
+        let isTwoClear = draftBlockers.indexOf(twoCellData[0]) == -1
+
+        if(twoCellData[0] == 'B'){
+          console.log('border')
+        } else if(isTwoClear){
+            if(twoCellData[1] !== ''){
+            console.log('flat and occupied')
+            isTwoCellOccupied = true
+          } else {
+            console.log('no drafter')
+            isTwoCellOccupied = false
+          }
+        } else {
+          console.log('incline or cobbles')
+          isTwoCellOccupied = false
+        }
+
+      }
+
+      console.log(thisGuy.rider)
+      if( isClear && isNextCellClear && isTwoCellOccupied){ 
+        console.log('this guy drafts...')
+        draftCount++
+
+        let ridersInSameSquare = []
+        // find other riders in same square
+        let otherRiders = currentPositions.filter(x => x.rider !== thisGuy.rider)
+        otherRiders.forEach(otherRider => {
+          if(otherRider.x == thisGuy.x){
+            ridersInSameSquare.push(otherRider)
+          }
+        })
+        
+        if(ridersInSameSquare.length > 0){
+          ridersInSameSquare.forEach(otherRider => {
+            console.log('also in same square: ',otherRider.rider)
+          })
+        }
+
+
+      } else {
+        console.log('this guy sticks')
+      }
+
+    })
+    if(draftCount == 0){
+      drafting = false
+    }
+  }
+
+
+
+
+}
+
+
 function moveAllRiders() {
   
   let trackData = track.getDataRange().getValues()
