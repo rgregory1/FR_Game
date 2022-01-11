@@ -84,3 +84,15 @@ function resetForNewTurn(teamColor='Blue'){
   // deck: 
   //  [ { name: 'Roller', energyDeck: [Object], hand: [], discard: [] },
   //    { name: 'Sprinter', energyDeck: [Object], hand: [], discard: [] } ] }
+
+
+
+
+
+
+
+
+
+
+
+

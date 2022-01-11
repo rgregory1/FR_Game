@@ -1,49 +1,68 @@
+function exhaustion(){
+
+  // get track data from spreadsheet
+  let trackData = track.getDataRange().getValues()
+
+  let playerData = getPlayerData()
+
+  // gather xy data for each rider
+  let currentPositions = getCurrentPositions(playerData, trackData)
+
+  currentPositions.forEach(thisGuy => {
+
+
+      // update rider position for check
+      let currentXY = getRiderXY(thisGuy.rider, trackData)
+
+
+      // -------------------------  test if next square is empty
+      let nextCellx = currentXY.x + 1
+      let isExhausted
+
+      for (let i = 0; i < trackData.length; i++){
+        let nextCell = trackData[i][nextCellx]
+        let nextCellData = nextCell.split("-")
+
+        if(nextCellData[0] == 'B'){
+          console.log('border')
+        } else if(nextCellData[1] == ''){
+          console.log('clear cell')
+          isExhausted = true
+        } else {
+          console.log('blocked')
+          isExhausted = false
+        }
+          
+      }
+
+      // add exhaustion to rider recycle deck
+      addExhaustion(thisGuy.rider)
+  })
+}
+
+function addExhaustion(rider){
+
+  // get current deck
+
+  // exhaustion to the reycle 
+
+  // update the db
+
+  
+}
+
 function draftPhase(){
 
   // get track data from spreadsheet
   let trackData = track.getDataRange().getValues()
 
-  // get array of arrays with only the riders marked on it
-  let positionData = getPositionData(trackData)
-
   let playerData = getPlayerData()
 
   // gather xy data for each rider
-  let currentPositions = []
-
-  playerData.forEach(player => {
-
-    let roller = player.team + 'Roller'
-
-    let rollerPosition = getRiderXY(roller, positionData)
-
-    currentPositions.push(rollerPosition)
-
-    let sprinter = player.team + 'Sprinter'
-
-    let sprinterPosition = getRiderXY(sprinter, positionData)
-
-    currentPositions.push(sprinterPosition)
-
-  })
-
-
-   // sort so upper lines are first in list, to establish left and right lane heirarchy
-  currentPositions.sort((firstItem, secondItem) => firstItem.y - secondItem.y)
-  // sort so lead riders are first in list
-  currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
-  currentPositions.reverse()
-
-  // // begin testing for drafting
-  // let thisGuy = {
-  //   rider: 'GreenSprinter',
-  //   x: 5,
-  //   y: 2
-  // }
+  let currentPositions = getCurrentPositions(playerData, trackData, 'draft')
 
   let drafting = true
   
-
   while(drafting){
 
     let draftCount = 0
@@ -51,16 +70,18 @@ function draftPhase(){
     currentPositions.forEach(thisGuy => {
       let draftBlockers = ['I','C']
 
+      // update rider position for check
+      let currentXY = getRiderXY(thisGuy.rider, trackData)
+
       // test current square for Incline or Cobbles
-      let thisCell = trackData[thisGuy.y][thisGuy.x]
+      let thisCell = trackData[currentXY.y][currentXY.x]
       let isClear = draftBlockers.indexOf(thisCell.split('-')[0]) == -1
       if(isClear) {
         console.log('the riders space is clear')
       }
 
       // -------------------------  test if next square is empty
-      let nextCells = []
-      let nextCellx = thisGuy.x + 1
+      let nextCellx = currentXY.x + 1
       let isNextCellClear
 
       for (let i = 0; i < trackData.length; i++){
@@ -79,12 +100,10 @@ function draftPhase(){
           isNextCellClear = false
         }
           
-
       }
 
       // -------------------------  test if square + 2 is empty
-      let twoCells = []
-      let twoCellx = thisGuy.x + 2
+      let twoCellx = currentXY.x + 2
       let isTwoCellOccupied
 
       for (let i = 0; i < trackData.length; i++){
@@ -113,13 +132,19 @@ function draftPhase(){
       console.log(thisGuy.rider)
       if( isClear && isNextCellClear && isTwoCellOccupied){ 
         console.log('this guy drafts...')
-        draftCount++
 
+        // move the rider on the track and in the trackData
+        moveOneRider(currentXY, 1, trackData)
+        draftCount++
+        SpreadsheetApp.flush()
+
+        // test for other riders in the same square
         let ridersInSameSquare = []
         // find other riders in same square
         let otherRiders = currentPositions.filter(x => x.rider !== thisGuy.rider)
+
         otherRiders.forEach(otherRider => {
-          if(otherRider.x == thisGuy.x){
+          if(otherRider.x == currentXY.x){
             ridersInSameSquare.push(otherRider)
           }
         })
@@ -127,6 +152,9 @@ function draftPhase(){
         if(ridersInSameSquare.length > 0){
           ridersInSameSquare.forEach(otherRider => {
             console.log('also in same square: ',otherRider.rider)
+
+            // move each rider in the square forward
+            moveOneRider(otherRider, 1, trackData)
           })
         }
 
@@ -136,6 +164,11 @@ function draftPhase(){
       }
 
     })
+
+    // reconfigure current positions
+    currentPositions = getCurrentPositions(playerData, trackData, 'draft')
+
+    SpreadsheetApp.flush()
     if(draftCount == 0){
       drafting = false
     }
@@ -157,28 +190,7 @@ function moveAllRiders() {
   let playerData = getPlayerData()
 
   // gather xy data for each rider
-  let currentPositions = []
-
-  playerData.forEach(player => {
-
-    let roller = player.team + 'Roller'
-
-    let rollerPosition = getRiderXY(roller, positionData)
-
-    currentPositions.push(rollerPosition)
-
-    let sprinter = player.team + 'Sprinter'
-
-    let sprinterPosition = getRiderXY(sprinter, positionData)
-
-    currentPositions.push(sprinterPosition)
-
-  })
-
-  // sort so lower lines are first in list, to establish left and right lane heirarchy
-  currentPositions.sort((firstItem, secondItem) => secondItem.y - firstItem.y)
-  // sort so lead riders are first in list
-  currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
+  let currentPositions = getCurrentPositions(playerData, trackData, 'movephase')
 
   let allPlayerMoves = getAllChoices()
 
@@ -205,17 +217,7 @@ function moveAllRiders() {
                 console.log('Position x: ', i)
                 console.log('Position y: ',pp)
 
-                // update track spreadsheet with new position
-                track.getRange(i+1,pp+ 1).setValue(cellData[0] + "-" +currentMove.rider)
-                //update array of arrays so next moves reflect new spaces taken
-                trackData[i][pp] = cellData[0] + "-" +currentMove.rider
-
-                // free up old space on track
-                let oldPosition = track.getRange(currentRider.y+1, currentRider.x+1).getValue()
-                track.getRange(currentRider.y+1, currentRider.x+1).setValue(oldPosition.split("-")[0] + "-")
-                // free up old space in array of arrays
-                trackData[currentRider.y][currentRider.x] = oldPosition.split("-")[0] + "-"
-
+                moveRiderOnTrack(i, pp, currentRider, cellData, trackData)
 
                 // set outer loop to break after this
                 isRiderPlaced = true
@@ -240,12 +242,39 @@ function moveAllRiders() {
   
 }
 
+/**
+ * move rider on track
+ * @param {Number} i              the Y value for the rider to move to on the track
+ * @param {Number} pp             the X value for the rider to move to on the track
+ * @param {Object} currentRider   the rider being moved
+ * @param {String} cellData       the data of the cell the rider is moving to
+ * @param {Array of Arrays} trackData      the track information
+ */
+function moveRiderOnTrack(i, pp, currentRider, cellData, trackData){
 
-function getRiderXY(rider, positionData){
+  // update track spreadsheet with new position
+  track.getRange(i+1,pp+ 1).setValue(cellData[0] + "-" + currentRider.rider)
+  //update array of arrays so next moves reflect new spaces taken
+  trackData[i][pp] = cellData[0] + "-" + currentRider.rider
+
+  // free up old space on track
+  let oldPosition = track.getRange(currentRider.y+1, currentRider.x+1).getValue()
+  track.getRange(currentRider.y+1, currentRider.x+1).setValue(oldPosition.split("-")[0] + "-")
+  // free up old space in array of arrays
+  trackData[currentRider.y][currentRider.x] = oldPosition.split("-")[0] + "-"
+  
+}
+
+
+function getRiderXY(rider, trackData){
+
+  if(trackData === undefined){
+    trackData = track.getDataRange().getValues()
+  }
 
   let riderPosition = {rider: rider}
-  positionData.forEach((line, i) =>{
-    let foundIt = line.indexOf(rider)
+  trackData.forEach((line, i) =>{
+    let foundIt = line.findIndex(x => x.includes(rider))
     if (foundIt !== -1){
       console.log('y: ', i)
       console.log('x: ', foundIt) 
@@ -260,6 +289,47 @@ function getRiderXY(rider, positionData){
 }
 
 
+
+function getCurrentPositions(playerData, trackData, sortType){
+
+   // gather xy data for each rider
+  let currentPositions = []
+
+  playerData.forEach(player => {
+
+    let roller = player.team + 'Roller'
+
+    let rollerPosition = getRiderXY(roller, trackData)
+
+    currentPositions.push(rollerPosition)
+
+    let sprinter = player.team + 'Sprinter'
+
+    let sprinterPosition = getRiderXY(sprinter, trackData)
+
+    currentPositions.push(sprinterPosition)
+
+  })
+
+  if(sortType == 'draft'){
+
+    // sort so upper lines are first in list, to establish left and right lane heirarchy
+    currentPositions.sort((firstItem, secondItem) => firstItem.y - secondItem.y)
+    // sort so lead riders are first in list
+    currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
+    currentPositions.reverse()
+
+  } else if (sortType == 'movephase'){
+
+    // sort so lower lines are first in list, to establish left and right lane heirarchy
+    currentPositions.sort((firstItem, secondItem) => secondItem.y - firstItem.y)
+    // sort so lead riders are first in list
+    currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
+
+  }
+
+  return currentPositions
+}
 
 
 /**

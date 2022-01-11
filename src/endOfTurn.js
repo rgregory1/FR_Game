@@ -4,7 +4,7 @@ function endOfTurn() {
   moveAllRiders()
 
   // drafting
-
+  draftPhase()
 
   // exaustion
 
