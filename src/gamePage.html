@@ -51,6 +51,9 @@
       .Black {
         background: Black;
       }
+      .deck-title {
+        font-weight: bold;
+      }
     </style>
     <title>Hello, world!</title>
   </head>
@@ -59,12 +62,21 @@
     <?!= include("renderTrack"); ?>    
     
     <div class="container mt-3">
-      <h1>
-        <span id="team"><?= color ?></span> Turn
-      </h1>
-     
-      <div id="displayData"></div>
-    </div>
+      <div class="row">
+        <div class="col-sm-8">
+          <h1>
+            <span id="team"><?= color ?></span> Turn
+          </h1>
+      
+          <div id="displayData"></div>
+        </div>
+        <div class="col-sm-4">
+          <div id="deck-display">
+            
+          </div>
+        </div>
+      </div> <!-- end row -->
+    </div> <!-- end container -->
 
     <template>
       <h2 class="mb-3 mt-3">Choose First Rider to Play</h2>
@@ -122,6 +134,7 @@
         console.log("inside game loop");
         console.log("team: ", team);
         google.script.run.withSuccessHandler(displayOptions).gameLoop(team);
+        google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
       }
 
       function displayOptions(options) {
@@ -218,6 +231,8 @@
         document
           .getElementById("submitCard")
           .addEventListener("click", handleSubmitCard);
+
+        google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
         
       }
 
@@ -242,6 +257,77 @@
     
         
         // displaySuccessMessage()
+      }
+
+      function renderDecks(decks){
+        
+        console.log(decks)
+        var deckDisplay = document.getElementById('deck-display')
+
+        // remove past content
+        while (deckDisplay.hasChildNodes()) {
+          deckDisplay.removeChild(deckDisplay.firstChild);
+        }
+
+        decks.forEach(deck => {
+
+          console.log(deck.name)
+          var deckTitle = document.createElement('H4')
+          var deckTitleText = document.createTextNode(deck.name)
+          deckTitle.appendChild(deckTitleText)
+          deckDisplay.appendChild(deckTitle)
+
+          var deckDisplayDl = document.createElement('dl')
+          deckDisplayDl.classList.add('row')
+
+          var energyDeckTitle = document.createElement('dt')
+          energyDeckTitle.classList.add("col-sm-4")
+          var energyDeckTitleContent = document.createTextNode('Energy')
+          energyDeckTitle.appendChild(energyDeckTitleContent)
+          deckDisplayDl.appendChild(energyDeckTitle)
+
+          var energyDeck = document.createElement('dd')
+          energyDeck.classList.add("col-sm-8")
+          deck.energyDeck.forEach(card => {
+            var cardValue = document.createTextNode(card + ' ')
+            energyDeck.appendChild(cardValue)
+          })
+          deckDisplayDl.appendChild(energyDeck)
+
+          var discardDeckTitle = document.createElement('dt')
+          discardDeckTitle.classList.add("col-sm-4")
+          var discardDeckTitleContent = document.createTextNode('Discard')
+          discardDeckTitle.appendChild(discardDeckTitleContent)
+          deckDisplayDl.appendChild(discardDeckTitle)
+
+          var discardDeck = document.createElement('dd')
+          discardDeck.classList.add("col-sm-8")
+          deck.discard.forEach(card => {
+            var cardValue = document.createTextNode(card + ' ')
+            discardDeck.appendChild(cardValue)
+          })
+          deckDisplayDl.appendChild(discardDeck)
+
+          var recycleDeckTitle = document.createElement('dt')
+          recycleDeckTitle.classList.add("col-sm-4")
+          var recycleDeckTitleContent = document.createTextNode('Recycle')
+          recycleDeckTitle.appendChild(recycleDeckTitleContent)
+          deckDisplayDl.appendChild(recycleDeckTitle)
+
+          var recycleDeck = document.createElement('dd')
+          recycleDeck.classList.add("col-sm-8")
+          deck.recycle.forEach(card => {
+            var cardValue = document.createTextNode(card + ' ')
+            recycleDeck.appendChild(cardValue)
+          })
+          deckDisplayDl.appendChild(recycleDeck)
+          
+          deckDisplay.appendChild(deckDisplayDl)
+        })
+
+        // var message = "decks will appear here";
+        // deckDisplay.appendChild(document.createTextNode(message));
+
       }
 
       function displaySuccessMessage() {

@@ -3,6 +3,7 @@ const ss = SpreadsheetApp.getActive()
 const baseGameInfo = ss.getSheetByName("baseGameInfo");
 const db = ss.getSheetByName('db')
 const track = ss.getSheetByName('Track')
+const turnSum = ss.getSheetByName('turnSummary')
 
 // const gameApiLink = baseGameInfo.getRange('B9').getValue()  // deployed game
 const gameApiLink = baseGameInfo.getRange('B10').getValue()  // dev game
@@ -12,6 +13,7 @@ function onOpen(){
    ui.createMenu('Play FR')
     .addItem('Setup Game', 'setUpGame')
     .addItem('Reset Turn', 'resetGameTurn')
+    .addItem('Create Restore Point', 'createRestorePoint')
     .addToUi()
 }
 
@@ -92,6 +94,23 @@ function resetGameTurn(){
 
   db.clearContents()
   db.getRange(1,1, dbRestore.length, dbRestore[0].length).setValues(dbRestore)
+
+}
+
+function createRestorePoint(){
+
+  let trackInfo = track.getDataRange().getValues()
+  let dbValues = db.getDataRange().getValues()
+
+  let trackRestore = ss.getSheetByName('trackRestore')
+  let dbRestore = ss.getSheetByName('dbRestore')
+
+  trackRestore.clearContents()
+  trackRestore.getRange(1,1,trackInfo.length, trackInfo[0].length).setValues(trackInfo)
+
+  dbRestore.clearContents()
+  dbRestore.getRange(1,1, dbValues.length, dbValues[0].length).setValues(dbValues)
+
 
 }
 

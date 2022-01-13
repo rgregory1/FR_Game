@@ -7,11 +7,9 @@ function endOfTurn() {
   draftPhase()
 
   // exaustion
+  exhaustion()
 
 
-  
-
-  // send out notifications
 
 
   

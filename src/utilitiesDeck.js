@@ -75,6 +75,26 @@ function resetForNewTurn(teamColor='Blue'){
 }
 
 
+function getDecksforDisplay(teamColor="Blue"){
+
+  let currentTurnData = findLastMove(teamColor)
+
+  let decks = currentTurnData.deck
+
+  decks[0].energyDeck.sort()
+  decks[0].recycle.sort()
+  decks[0].discard.sort()
+  decks[1].energyDeck.sort()
+  decks[1].recycle.sort()
+  decks[1].discard.sort()
+
+  console.log(decks)
+
+  return decks
+
+}
+
+
 
 	// { team: 'Green',
   // turn: 0,

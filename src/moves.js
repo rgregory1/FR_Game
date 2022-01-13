@@ -8,6 +8,9 @@ function exhaustion(){
   // gather xy data for each rider
   let currentPositions = getCurrentPositions(playerData, trackData)
 
+  // gather exhaustion data for summary
+  let exhaustionSummary = []
+
   currentPositions.forEach(thisGuy => {
 
 
@@ -36,17 +39,34 @@ function exhaustion(){
       }
 
       // add exhaustion to rider recycle deck
-      addExhaustion(thisGuy.rider)
+      if(isExhausted){
+        addExhaustion(thisGuy.rider)
+        exhaustionSummary.push(thisGuy.rider)
+      }
+      
   })
+
+  addOccurancesToSummary(exhaustionSummary, 'exhaustion')
+
 }
 
-function addExhaustion(rider){
+function addExhaustion(rider='BlueSprinter'){
+
+  let riderArray = rider.split(/(?=[A-Z])/);
 
   // get current deck
+  let currentTurnData = findLastMove(riderArray[0])
 
+  currentTurnData.deck.forEach(thisDeck =>{
+    if(thisDeck.name == riderArray[1]){
+      thisDeck.recycle.push('2E')
+    }
+  })
+  console.log(currentTurnData)
   // exhaustion to the reycle 
 
   // update the db
+  updatePlayerTurn(riderArray[0], currentTurnData)
 
   
 }
@@ -62,6 +82,9 @@ function draftPhase(){
   let currentPositions = getCurrentPositions(playerData, trackData, 'draft')
 
   let drafting = true
+
+  // start to collect the draft count for the turn summary
+  let riderDraftCount = []
   
   while(drafting){
 
@@ -136,6 +159,7 @@ function draftPhase(){
         // move the rider on the track and in the trackData
         moveOneRider(currentXY, 1, trackData)
         draftCount++
+        riderDraftCount.push(currentXY.rider)
         SpreadsheetApp.flush()
 
         // test for other riders in the same square
@@ -155,6 +179,7 @@ function draftPhase(){
 
             // move each rider in the square forward
             moveOneRider(otherRider, 1, trackData)
+            riderDraftCount.push(otherRider.rider)
           })
         }
 
@@ -169,14 +194,14 @@ function draftPhase(){
     currentPositions = getCurrentPositions(playerData, trackData, 'draft')
 
     SpreadsheetApp.flush()
+
     if(draftCount == 0){
       drafting = false
     }
   }
 
-
-
-
+  // add draft count to turn summary
+  addOccurancesToSummary(riderDraftCount, 'draft')
 }
 
 
@@ -193,6 +218,11 @@ function moveAllRiders() {
   let currentPositions = getCurrentPositions(playerData, trackData, 'movephase')
 
   let allPlayerMoves = getAllChoices()
+
+  // store player moves in turn summary
+  initialTurnSummary(allPlayerMoves)
+  // prepare for reduction data
+  let reductions = []
 
   currentPositions.forEach((currentRider, index) => {
 
@@ -219,6 +249,12 @@ function moveAllRiders() {
 
                 moveRiderOnTrack(i, pp, currentRider, cellData, trackData)
 
+                // test if full move not taken
+                let expectedMove = currentRider.x + currentMove.move
+                if(pp < expectedMove){
+                  reductions.push({rider: currentRider.rider, reduction: expectedMove - pp})
+                }
+
                 // set outer loop to break after this
                 isRiderPlaced = true
                 
@@ -234,6 +270,8 @@ function moveAllRiders() {
       if (isRiderPlaced) break
     }
   })
+
+  addReductionsToSummary(reductions)
 
   // reset decks for next turn
   playerData.forEach(player => {
