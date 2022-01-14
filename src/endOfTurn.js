@@ -9,8 +9,5 @@ function endOfTurn() {
   // exaustion
   exhaustion()
 
-
-
-
   
 }

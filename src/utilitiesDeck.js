@@ -1,7 +1,7 @@
 function returnHand(color = 'Green', rider = 'Roller') {
   let status = findLastMove(color)
 
-  let energyDeck, hand, deckIndex
+  let energyDeck, hand, deckIndex 
 
   status['deck'].forEach((deck, i) =>{
     if (deck.name == rider){
@@ -10,8 +10,28 @@ function returnHand(color = 'Green', rider = 'Roller') {
     }
   })
 
+  // grab four cards if there are four cards
   if(energyDeck.length >= 4){
     hand = {rider: rider, hand: energyDeck.splice(0,4)}
+  } else if (status.deck[deckIndex].recycle.length == 0){
+    hand = {rider: rider, hand: [...energyDeck]}
+    energyDeck = []
+  } else if (energyDeck.length == 0 && status.deck[deckIndex].recycle.length == 0){
+    hand = {rider: rider, hand: ['2E']}
+  } else {
+
+    // grab what is in the energy deck
+    let currentHandLength = energyDeck.length
+    let currentHand = energyDeck.splice(0,currentHandLength)
+   
+    // shuffle and move recycle to energy
+    energyDeck = shuffleDeck(status.deck[deckIndex].recycle)
+    status.deck[deckIndex].recycle = []
+
+    // add remaining of 4 cards to hand
+    let remainingCurrentHand = energyDeck.splice(0,4-currentHandLength)
+
+    hand = {rider: rider, hand: [...currentHand, ...remainingCurrentHand]}
   }
 
 
@@ -27,7 +47,7 @@ function returnHand(color = 'Green', rider = 'Roller') {
 
   // return hand to page
 
-  console.log(status.deck[1].energyDeck)
+  console.log(status.deck[deckIndex].energyDeck)
   updatePlayerTurn(color, status)
 
   return hand // {rider: rider, hand: hand}

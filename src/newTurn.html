@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello, world!</title>
+    <style>
+
+      h2.text-stuff {
+        font-size: 30px;
+      }
+
+      p.text-stuff {
+        font-size: 20px;
+      }
+
+      a.button {
+        border: none;
+        color: white;
+        padding: 1em 1.5em;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        background-color: #4caf50;
+        border-radius: 5px;
+      }
+
+      a.button:hover {
+        background-color: #555;
+      }
+
+      a.button:active {
+        background-color: black;
+      }
+
+      a.button:visited {
+        background-color: #ccc;
+      }
+      
+      table.GeneratedTable {
+        /* width: 100%; */
+        background-color: #ffffff;
+        border-collapse: collapse;
+        border-width: 2px;
+        border-color: #ffcc00;
+        border-style: solid;
+        color: #000000;
+      }
+
+      table.GeneratedTable td, table.GeneratedTable th {
+        border-width: 2px;
+        border-color: #ffcc00;
+        border-style: solid;
+        padding: 3px;
+      }
+
+      table.GeneratedTable thead {
+        background-color: #ffcc00;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <h2><?= player.team ?> Team Play Round <?= nextGameTurn ?></h2>
+
+    <p>Last turn summary:</p>
+
+    <table class="GeneratedTable">
+        <thead>
+          <tr> 
+            <th style="width:150px">Rider</th>
+            <th style="width:75px">Card Played</th>
+            <th style="width:75px">Reduction</th>
+            <th style="width:75px">Draft</th>
+            <th style="width:75px">Exhaustion</th> 
+          </tr>
+        </thead>
+          <tbody>
+          <? turnReport.forEach(line => { ?>
+          <tr>
+            <td><?= line[0] ?></td>
+            <td style="text-align:center"><?= line[1] ?></td>
+            <td style="text-align:center"><?= line[2] ?></td>
+            <td style="text-align:center"><?= line[3] ?></td>
+            <td style="text-align:center"><?= line[4] ?></td>
+          </tr>
+          <? }) ?>
+        </tbody>
+      </table>
+    <p>Click below to play your cards.</p>
+    
+    <p>
+    <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
+        Play Now
+    </a>
+    </p>
+
+  
+   
+  </body>
+</html>

@@ -102,7 +102,7 @@ function emailNextTeam(){
       })
   } else {
 
-    initiatGameTurn()
+    initiatFirstGameTurn()
     console.log('begin the game')
   }
 

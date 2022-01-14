@@ -16,14 +16,13 @@ function testForNewTurn() {
 
   if(stillToPlay.length == 0){
     endOfTurn()
-    initiatGameTurn()
+    initiateGameTurn()
   }else {
     console.log('still wating for players')
   }
 }
 
-
-function initiatGameTurn() {
+function initiateGameTurn() {
   
   // add one to game turn
   increaseGameTurn()
@@ -33,37 +32,70 @@ function initiatGameTurn() {
   let nextGameTurn = getCurrentGameTurn() + 1
 
   // generate turn report to email to each player
-  let turnReport = getLastSummaryLine()
+  let turnReportObject = getLastSummaryLine()
 
-  let table = '<table><tbody><tr> <th>Rider</th><th>Card Played</th><th>Reduction</th><th>Draft</th><th>Exhaustion</th> </tr>'
+  let turnReportArray =[]
 
-  turnReport.forEach(line => {
-    table += '<tr>'
-
-    table += `<td>${line.rider}</td><td>${line.move}</td>`
+  turnReportObject.forEach(line => {
+    
+    let thisLine = [line.rider,line.move]
 
     if('reduction' in line){
-      table +=`<td>${line.reduction}</td>`
-    }else table += '<td></td>'
+      thisLine.push(line.reduction)
+    }else thisLine.push('')
 
     if('draft' in line){
-      table +=`<td>${line.draft}</td>`
-    }else table += '<td></td>'
+      thisLine.push(line.draft)
+    }else thisLine.push('')
 
     if('exhaustion' in line){
-      table +=`<td>${line.exhaustion}</td>`
-    }else table += '<td></td>'
+      thisLine.push(line.exhaustion)
+    }else thisLine.push('')
 
-    table += '</tr>'
+    turnReportArray.push(thisLine)
   })
 
-  table += '</tbody></table>'
+
+
+  playerData.forEach(player => {
+
+    let htmlTemplate = HtmlService.createTemplateFromFile('newTurn')
+
+    htmlTemplate.player = player
+    htmlTemplate.turnReport = turnReportArray
+    htmlTemplate.gameApiLink = gameApiLink
+    htmlTemplate.nextGameTurn = nextGameTurn
+    htmlTemplate.table = 'placeholder'
+
+    let htmlForEmail = htmlTemplate.evaluate().getContent()
+
+
+    MailApp.sendEmail(
+      player.email,
+      `Play turn ${nextGameTurn}`,
+      '',
+      {
+        htmlBody: htmlForEmail
+      }
+    )
+  })
+}
+
+
+function initiatFirstGameTurn() {
+  
+  // add one to game turn
+  increaseGameTurn()
+
+
+  let playerData = getPlayerData()
+  let nextGameTurn = getCurrentGameTurn() + 1
+
+  
 
   playerData.forEach(player => {
     let body = `<h2>${player.team} Team Play Round ${nextGameTurn}</h2>
 
-    Last turn summary:
-    ${table}
     
     Click below to play your cards.
     

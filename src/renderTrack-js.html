@@ -20,6 +20,8 @@
 
         cell = cellSting.split("-")
         var col = document.createElement("td")
+
+        // setup class for cell
         if(cell[0] == 'B'){
           col.className = 'table-success'
         } else if(cell[0] == 'S' || cell[0] == 'F'){
@@ -27,6 +29,9 @@
         } else if(cell[0] == 'R'){
           col.className = 'table-secondary border border-white'
         }
+
+        // create td html conent for rider
+        // rider.split(/(?=[A-Z])/)
         col.textContent = cell[1]
         row.appendChild(col)
       })
