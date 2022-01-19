@@ -1,3 +1,22 @@
+function testNumbersOrEmpty(){
+
+  // let test = ''  // here we are       false - false
+  // let test = '12'  // here we are        true - false
+  let test = 'GreenSprinter'  // here we are true - false
+
+
+  console.log(test !== '')
+  console.log(isNaN(test))
+
+  if(test !== '' && isNaN(test)){
+    console.log('here we are')
+  } else{
+    console.log('go on')
+  }
+
+}
+
+
 function stringTest(){
   let dude = {
     name: 'the dude',

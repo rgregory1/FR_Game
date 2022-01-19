@@ -51,7 +51,38 @@
       .Black {
         background: Black;
       }
+      .Red {
+        background: Red;
+      }
       .deck-title {
+        font-weight: bold;
+      }
+      .Blue-rider {
+        background: Blue;
+        border-radius: 15px;
+        padding: 5px 27px;
+        color: white;
+        font-weight: bold;
+      }
+      .Black-rider {
+        background: Black;
+        border-radius: 15px;
+        padding: 5px 27px;
+        color: white;
+        font-weight: bold;
+      }
+      .Green-rider {
+        background: Green;
+        border-radius: 15px;
+        padding: 5px 27px;
+        color: white;
+        font-weight: bold;
+      }
+      .Red-rider {
+        background: Red;
+        border-radius: 15px;
+        padding: 5px 27px;
+        color: white;
         font-weight: bold;
       }
     </style>
@@ -128,6 +159,12 @@
     <script>
       var team = document.getElementById("team").textContent;
       document.addEventListener("DOMContentLoaded", afterPageLoaded);
+      
+      document.addEventListener("DOMContentLoaded", slide);
+
+      function slide(){
+        document.getElementById("render-track").scrollLeft +=900;
+       }
 
       function afterPageLoaded() {
         var team = document.getElementById("team").textContent;
@@ -238,23 +275,23 @@
 
       function handleSubmitCard() {
         var cardChoice = document.getElementById("card_options");
-        
-         var displayCards = document.getElementById("display_cards")
-        while (displayCards.hasChildNodes()) {
-          displayCards.removeChild(displayCards.firstChild);
-        }
-        
+        var teamColor = document.getElementById("team").textContent;
+        var riderType = document.getElementById("rider_type").textContent
+
         if (cardChoice.value == "") {
           alert("nope");
           // google.script.run.sameNumDialog()
           return;
         }
-        var teamColor = document.getElementById("team").textContent;
-        var riderType = document.getElementById("rider_type").textContent
+        
+        // clear cards and drop down so mistakes don't enter the game
+        var displayData = document.getElementById("displayData")
+        while (displayData.hasChildNodes()) {
+          displayData.removeChild(displayData.firstChild);
+        }
+        
         console.log(cardChoice.value)
         google.script.run.withSuccessHandler(displayCardOptions).sendCardChoice(cardChoice.value, teamColor, riderType);
-        
-    
         
         // displaySuccessMessage()
       }

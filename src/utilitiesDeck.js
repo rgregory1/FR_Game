@@ -1,4 +1,4 @@
-function returnHand(color = 'Green', rider = 'Roller') {
+function returnHand(color = 'Blue', rider = 'Roller') {
   let status = findLastMove(color)
 
   let energyDeck, hand, deckIndex 
@@ -60,6 +60,7 @@ function updatePlayerTurn(team='Black', playerData){
 
    db.appendRow([
     playerData.team,
+    JSON.stringify(playerData.special),
     playerData.turn,
     playerData.phase,
     JSON.stringify(playerData.hand),

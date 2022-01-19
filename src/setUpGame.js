@@ -14,6 +14,7 @@ function onOpen(){
     .addItem('Setup Game', 'setUpGame')
     .addItem('Reset Turn', 'resetGameTurn')
     .addItem('Create Restore Point', 'createRestorePoint')
+    .addItem('Check 4 Turn','testForNewTurn')
     .addToUi()
 }
 
@@ -63,7 +64,7 @@ function setUpGame() {
   // create db sheet for tracking game turns
   const db = ss.getSheetByName("db") || ss.insert("db");
   db.clear();
-  let dbheader = [["team", "turn", "phase", "hand", "choice", "deck"]];
+  let dbheader = [["team", "speical", "turn", "phase", "hand", "choice", "deck"]];
   db.getRange(1, 1, 1, dbheader[0].length).setValues(dbheader);
 
   // setup each team with all necessary sheets and data
@@ -75,14 +76,23 @@ function setUpGame() {
     let deckString = JSON.stringify(decks);
 
     // add initial data to db
-    db.appendRow([team[1], -1, 0, JSON.stringify({}), JSON.stringify([]), deckString]);
+    db.appendRow([team[1],JSON.stringify([]), -1, 0, JSON.stringify({}), JSON.stringify([]), deckString]);
   });
 
   // set game turn to -1
    baseGameInfo.getRange('B11').setValue(-1)
 
+  // clear turn summary
+  turnSum.clear()
+
+  // get track for setup
+  ss.deleteSheet(track)
+  let trackBegin = ss.getSheetByName('trackBegin')
+  trackBegin.copyTo(ss).setName('Track')
+
   emailNextTeam()
 }
+
 
 function resetGameTurn(){
 

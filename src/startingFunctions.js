@@ -126,6 +126,7 @@ function incrementPlayerTurn(team='Black'){
 
    db.appendRow([
      playerData.team,
+     JSON.stringify(playerData.special),
      playerData.turn,
      playerData.phase,
      JSON.stringify(playerData.hand),

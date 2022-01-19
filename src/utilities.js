@@ -1,9 +1,3 @@
-function getPlayerDeck(team) {
-
-  let playerDate = getPlayerData(team);
-
-  
-}
 
 /*
  *  returns team data from baseGameInfo sheet
@@ -58,11 +52,12 @@ function findLastMove(team='Blue') {
 
   let lastMoveObj ={
     team: lastMove[0],
-    turn: lastMove[1],
-    phase: lastMove[2],
-    hand: JSON.parse(lastMove[3]),
-    choice: JSON.parse(lastMove[4]),
-    deck: JSON.parse(lastMove[5]),
+    special: JSON.parse(lastMove[1]),
+    turn: lastMove[2],
+    phase: lastMove[3],
+    hand: JSON.parse(lastMove[4]),
+    choice: JSON.parse(lastMove[5]),
+    deck: JSON.parse(lastMove[6]),
   }
   return lastMoveObj
 }

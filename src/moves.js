@@ -209,8 +209,8 @@ function moveAllRiders() {
   
   let trackData = track.getDataRange().getValues()
 
-  // get array of arrays with only the riders marked on it
-  let positionData = getPositionData(trackData)
+  // // get array of arrays with only the riders marked on it
+  // let positionData = getPositionData(trackData)
 
   let playerData = getPlayerData()
 
@@ -229,46 +229,54 @@ function moveAllRiders() {
     // match rider to move
     let currentMove = allPlayerMoves.find(x => x.rider == currentRider.rider)
 
-    // calculate where the ride should end up
-    let potentialPosition = currentPositions[index].x + currentMove.move
+    // // check for incline/decline/feedzone and adjust move...
+    let adjustedMove = checkForMoveAdjustments(currentRider, currentMove.move, trackData)
+  
 
-    let isRiderPlaced = false
+    let finalYPosition = moveOneRider(currentRider, adjustedMove, trackData)
 
-    // if space is not free, remove one row and test new row until you get to the original place
-    for(let pp = potentialPosition; pp > currentMove.move; pp-- ){
-
-            // test if potential space is free
-            for(let i = trackData.length-1; i >= 0; i--){
-              
-              let cellData = trackData[i][pp].split("-")
-
-              if (cellData[0] !== 'B' && cellData[1] == ''){
-                console.log('we are good to move here: ', currentMove.rider)
-                console.log('Position x: ', i)
-                console.log('Position y: ',pp)
-
-                moveRiderOnTrack(i, pp, currentRider, cellData, trackData)
-
-                // test if full move not taken
-                let expectedMove = currentRider.x + currentMove.move
-                if(pp < expectedMove){
-                  reductions.push({rider: currentRider.rider, reduction: expectedMove - pp})
-                }
-
-                // set outer loop to break after this
-                isRiderPlaced = true
-                
-                // stop once new position is found
-                break
-
-              } else {
-                console.log('space is occupied')
-                console.log('Position x: ', i)
-                console.log('Position y: ',pp)
-              }
-            }
-      if (isRiderPlaced) break
+     // test if full move not taken
+    let expectedMove = currentRider.x + currentMove.move
+    if(finalYPosition !== expectedMove){
+      reductions.push({rider: currentRider.rider, reduction: expectedMove - finalYPosition})
     }
+
+    // // calculate where the ride should end up
+    // let potentialPosition = currentPositions[index].x + currentMove.move
+
+    // let isRiderPlaced = false
+
+    // // if space is not free, remove one row and test new row until you get to the original place
+    // for(let pp = potentialPosition; pp > currentMove.move; pp-- ){
+
+    //         // test if potential space is free
+    //         for(let i = trackData.length-1; i >= 0; i--){
+              
+    //           let cellData = trackData[i][pp].split("-")
+
+    //           if (cellData[0] !== 'B' && cellData[1] == ''){
+    //             console.log('we are good to move here: ', currentMove.rider)
+    //             console.log('Position x: ', i)
+    //             console.log('Position y: ',pp)
+
+    //             moveRiderOnTrack(i, pp, currentRider, cellData, trackData)
+
+               
+
+    //             // set outer loop to break after this
+    //             isRiderPlaced = true
+                
+    //             // stop once new position is found
+    //             break
+
+    //           } else {
+    //             console.log('space is occupied')
+    //             console.log('Position x: ', i)
+    //             console.log('Position y: ',pp)
+    //           }
+    //         }
+    //   if (isRiderPlaced) break
+    // }
   })
 
   addReductionsToSummary(reductions)
