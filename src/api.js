@@ -18,12 +18,14 @@ function doGet(e) {
 function loadStartPage(color){
   let page = HtmlService.createTemplateFromFile("startPage");
 
+  let gameName = getGameName()
+
   page.color = color;
 
   let finalPage = page
     .evaluate()
     .addMetaTag("viewport", "width=device-width, initial-scale=1")
-    .setTitle("FR Game");
+    .setTitle("FR Game - " + gameName);
 
   return finalPage;
 }
@@ -31,12 +33,14 @@ function loadStartPage(color){
 function loadGamePage(color){
   let page = HtmlService.createTemplateFromFile("gamePage");
 
+  let gameName = getGameName()
+  
   page.color = color;
-
+  
   let finalPage = page
     .evaluate()
     .addMetaTag("viewport", "width=device-width, initial-scale=1")
-    .setTitle("FR Game");
+    .setTitle("FR Game - " + gameName);
 
   return finalPage;
 }

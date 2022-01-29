@@ -83,5 +83,45 @@ function getApiUrl(){
   console.log(apiLink)
 }
 
+function getGameName(){
+  let gameName = baseGameInfo.getRange('B12').getValue()
+  return gameName
+}
+
+
+function getTrackName(){
+  let trackName = baseGameInfo.getRange('B17').getValue()
+  return trackName
+}
+
+function removeStartNumbers(){
+
+  let trackData = getTrackData()
+
+  trackData.forEach((line, i) => {
+
+    line.forEach((cell, x) => {
+      let cellData = cell.split("-")
+      if (cellData[0] !== 'B' && cellData[1] !== ''){
+        if(!isNaN(cellData[1])){
+          console.log('ready for removal', cellData[1])
+          track.getRange(i+1, x+1).setValue(cellData[0]+'-')
+        } 
+      } 
+
+    })
+  } )
+
+}
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1,4 +1,4 @@
-function gameLoop(team = "Blue") {
+function gameLoop(team = "Green") {
   let status = findLastMove(team);
 
   if (status.turn == -1) {
@@ -14,7 +14,7 @@ function gameLoop(team = "Blue") {
   }
 
   if (JSON.stringify(status.hand) !== '{}'){
-    return { type: 'deckReturn', hand: status.hand}
+    return { type: 'deckReturn', hand: status.hand, rider: status.hand.rider}
   }
   
 }

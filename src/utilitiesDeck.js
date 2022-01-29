@@ -100,20 +100,27 @@ function getDecksforDisplay(teamColor="Blue"){
 
   let currentTurnData = findLastMove(teamColor)
 
-  let decks = currentTurnData.deck
+  let deckDisplay = {
+    decks: currentTurnData.deck,
+    choice: currentTurnData.choice
+  }
+  // let decks = currentTurnData.deck
 
-  decks[0].energyDeck.sort()
-  decks[0].recycle.sort()
-  decks[0].discard.sort()
-  decks[1].energyDeck.sort()
-  decks[1].recycle.sort()
-  decks[1].discard.sort()
+  deckDisplay.decks[0].energyDeck.sort()
+  deckDisplay.decks[0].recycle.sort()
+  deckDisplay.decks[0].discard.sort()
+  deckDisplay.decks[1].energyDeck.sort()
+  deckDisplay.decks[1].recycle.sort()
+  deckDisplay.decks[1].discard.sort()
 
-  console.log(decks)
+  console.log(deckDisplay.decks)
 
-  return decks
+  // return decks
+  return deckDisplay
 
 }
+
+
 
 
 

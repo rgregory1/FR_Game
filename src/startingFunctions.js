@@ -84,24 +84,26 @@ function emailNextTeam(){
 
     // get random player
     let nextPlayer = possiblePlayers[random]
-    // let apiLink = ScriptApp.getService().getUrl()
+    
+    let htmlTemplate = HtmlService.createTemplateFromFile('playerEmail')
 
-    let body = `<h2>Congratulations ${nextPlayer.team} Team!</h2>
-    
-    It's your turn to pick your starting positions
-    
-    <a href="${gameApiLink}?color=${nextPlayer.team}">Choose starting positions now</a>`
-    console.log(nextPlayer)
+    htmlTemplate.player = nextPlayer
+    htmlTemplate.gameApiLink = gameApiLink
+
+    let htmlForEmail = htmlTemplate.evaluate().getContent()
+
 
     MailApp.sendEmail(
       nextPlayer.email,
-      'Pick your starting positions',
+      `${nextPlayer.team} Team - Choose Starting Positions`,
       '',
       {
-        htmlBody: body
-      })
+        htmlBody: htmlForEmail
+      }
+    )
   } else {
 
+    removeStartNumbers()
     initiatFirstGameTurn()
     console.log('begin the game')
   }

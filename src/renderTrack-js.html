@@ -61,8 +61,14 @@
       
       tbody.appendChild(row)
     })
+
+    google.script.run.withSuccessHandler(displayTrackName).getTrackName()
   }
 
+  function displayTrackName(trackName){
+    var trackNamePara = document.getElementById('track-name')
+    trackNamePara.textContent += trackName;
+  }
   
 
 </script>

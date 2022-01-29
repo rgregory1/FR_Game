@@ -87,7 +87,7 @@ function initiatFirstGameTurn() {
   // add one to game turn
   increaseGameTurn()
 
-
+  let gameName = getGameName()
   let playerData = getPlayerData()
   let nextGameTurn = getCurrentGameTurn() + 1
 
@@ -104,12 +104,59 @@ function initiatFirstGameTurn() {
 
     MailApp.sendEmail(
       player.email,
-      `Play turn ${nextGameTurn}`,
+      `${gameName} - Play turn ${nextGameTurn}`,
       '',
       {
         htmlBody: body
       })
   })
+}
+
+function testForLaggingPlayer() {
+  
+  let playerData = getPlayerData()
+
+  // add turn data to each player
+  playerData.forEach(player => {
+    let playerData = findLastMove(player.team)
+    player.turn = playerData.turn
+  })
+
+  let currentGameTurn = getCurrentGameTurn()
+  let nextGameTurn = getCurrentGameTurn() + 1
+
+  // filter out players who have already positioned for the start
+  let stillToPlay = playerData.filter(x => x.turn == currentGameTurn)
+
+  let gameName = getGameName()
+  
+  if(stillToPlay.length > 0){
+
+    console.log('Still to play: ')
+
+    
+    stillToPlay.forEach(player => {
+
+      console.log(player.team)
+
+      let body = `<h2>${player.team} Team Play Round ${nextGameTurn}</h2>
+
+      <b>Looks like everyone is waiting on you to play your turn.</b>
+
+      Click below to play your cards.
+      
+      <a href="${gameApiLink}?color=${player.team}">Play Now</a>`
+      
+
+      MailApp.sendEmail(
+        player.email,
+        `${gameName} - Play turn ${nextGameTurn} reminder`,
+        '',
+        {
+          htmlBody: body
+        })
+    })
+  }
 }
 
 

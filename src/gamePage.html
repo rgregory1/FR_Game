@@ -39,6 +39,19 @@
         float: left;
         margin: 20px;
       }
+      .played-card{
+        background: #000;
+        width: 2.25em;
+        height: 3.5em;
+        border-radius: 14px;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2em;
+        float: left;
+        margin: 20px;
+      }
       #displayData, .card_options_div {
         clear: both;
       }
@@ -50,6 +63,14 @@
       }
       .Black {
         background: Black;
+      }
+      .Pink {
+        background: pink;
+        color: black;
+      }
+      .White {
+        background: #fff;
+        color: black;
       }
       .Red {
         background: Red;
@@ -84,6 +105,23 @@
         padding: 5px 27px;
         color: white;
         font-weight: bold;
+      }
+      .Pink-rider {
+        background: Pink;
+        border-radius: 15px;
+        padding: 5px 27px;
+        color: black;
+        font-weight: bold;
+      }
+      .White-rider {
+        background: #d4d4d4;
+        border-radius: 15px;
+        padding: 5px 27px;
+        color: black;
+        font-weight: bold;
+      }
+      #deck-display h4 {
+        clear: both;
       }
     </style>
     <title>Hello, world!</title>
@@ -160,11 +198,11 @@
       var team = document.getElementById("team").textContent;
       document.addEventListener("DOMContentLoaded", afterPageLoaded);
       
-      document.addEventListener("DOMContentLoaded", slide);
+      // document.addEventListener("DOMContentLoaded", slide);
 
-      function slide(){
-        document.getElementById("render-track").scrollLeft +=900;
-       }
+      // function slide(){
+      //   document.getElementById("render-track").scrollLeft +=900;
+      //  }
 
       function afterPageLoaded() {
         var team = document.getElementById("team").textContent;
@@ -296,14 +334,37 @@
         // displaySuccessMessage()
       }
 
-      function renderDecks(decks){
+      function renderDecks(deckObject){
+
+        let decks = deckObject.decks
         
-        console.log(decks)
+        console.log(deckObject.choice.length)
         var deckDisplay = document.getElementById('deck-display')
 
         // remove past content
         while (deckDisplay.hasChildNodes()) {
           deckDisplay.removeChild(deckDisplay.firstChild);
+        }
+
+        if(deckObject.choice.length > 0){
+
+          console.log('inside the choice loop')
+          var playedCardsDiv = document.createElement('div')
+          deckDisplay.appendChild(playedCardsDiv)
+
+          var playedCardsTitle = document.createElement('H4')
+          var playedCardsTitleText = document.createTextNode('Cards Played')
+          playedCardsTitle.appendChild(playedCardsTitleText)
+          playedCardsDiv.appendChild(playedCardsTitle)
+
+          deckObject.choice.forEach(choice => {
+            
+            var playedCardBody = document.createElement('div')
+            playedCardBody.classList.add("played-card")
+            var playedCardBodyText = document.createTextNode(choice.card)
+            playedCardBody.appendChild(playedCardBodyText)
+            playedCardsDiv.appendChild(playedCardBody)
+          })
         }
 
         decks.forEach(deck => {

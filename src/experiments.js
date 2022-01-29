@@ -1,3 +1,23 @@
+function testHour(){
+
+  
+  increment = baseGameInfo.getRange('B13').getValue()
+  
+  const d = new Date();
+  let hour =  parseInt(d.getHours());
+
+  let fireOff = false
+
+  if (hour % increment == 0){
+    fireOff = true
+    console.log('divisible by: ', increment)
+  } else {
+    console.log('not divisible by: ', increment)
+  }
+
+
+}
+
 function testNumbersOrEmpty(){
 
   // let test = ''  // here we are       false - false
