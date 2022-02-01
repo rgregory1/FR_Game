@@ -1,6 +1,14 @@
 function gameLoop(team = "Green") {
+
+  // check for game end
+  let isGameOver = getGameOver()
+  if (isGameOver){
+    return { type: 'gameOver'}
+  }
+
   let status = findLastMove(team);
 
+  // check if it's time to choose starting positions
   if (status.turn == -1) {
     console.log("choose starting position");
 
@@ -9,10 +17,12 @@ function gameLoop(team = "Green") {
     return { type: "startingPositions", positions: possiblePositions };
   }
 
+  // check if rider hasn't choosen a rider yet
   if (status.phase == 0 && JSON.stringify(status.hand) === '{}'){
     return { type: "chooseDeck"};
   }
 
+  // if rider has been choose and screen refreshed return previously selected hand
   if (JSON.stringify(status.hand) !== '{}'){
     return { type: 'deckReturn', hand: status.hand, rider: status.hand.rider}
   }

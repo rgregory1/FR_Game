@@ -82,6 +82,9 @@ function setUpGame() {
   // set game turn to -1
    baseGameInfo.getRange('B11').setValue(-1)
 
+  // reset gameover
+  baseGameInfo.getRange('B15').setValue('No')
+
   // clear turn summary
   turnSum.clear()
 

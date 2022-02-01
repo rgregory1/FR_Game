@@ -69,7 +69,7 @@
         color: black;
       }
       .White {
-        background: #fff;
+        background: #d4d4d4;
         color: black;
       }
       .Red {
@@ -123,6 +123,9 @@
       #deck-display h4 {
         clear: both;
       }
+      .game-over {
+
+      }
     </style>
     <title>Hello, world!</title>
   </head>
@@ -164,27 +167,30 @@
     </template>
 
     <template>
-      <h2 class="mb-3 mt-3">Choose <span id="rider_type"></span> Card</h2>
-       <div id="display_cards" class="mb-3 mt-3"></div>
-      <div class="card_options_div">
-        <label for="card_options" class="form-label"
-          >Choose </label
-        >
-        <select
-          class="form-select mb-3"
-          id="card_options"
-          aria-label="card_options"
-          required
-        >
-          <option></option>
-        </select>
-
-        <div class="col-auto">
-          <button type="submit" class="btn btn-primary mb-3" id="submitCard">
-            Submit Card
-          </button>
+      
+        <h2 class="mb-3 mt-3">Choose <span id="rider_type"></span> Card</h2>
+        
+        <div class="card_options_div row">
+          <div class="col-6 form-floating">
+            <select
+              class="form-select mb-3"
+              id="card_options"
+              aria-label="card_options"
+              required
+            >
+              
+            </select>
+            <label for="card_options">Choose card</label>
+          </div>
+          <div class="col-6">
+            <button type="submit" class="btn btn-primary mb-3" id="submitCard">
+              Submit Card
+            </button>
+          </div>
         </div>
-      </div>
+      
+      <div id="display_cards" class="mb-3 mt-3"></div>
+      
     </template>
 
     <template>
@@ -208,7 +214,11 @@
         var team = document.getElementById("team").textContent;
         console.log("inside game loop");
         console.log("team: ", team);
+
+        // determing what to show as far as cards to pick
         google.script.run.withSuccessHandler(displayOptions).gameLoop(team);
+
+        // show available energy, discard, and recycle on right side
         google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
       }
 
@@ -218,6 +228,14 @@
           displayP.removeChild(displayP.firstChild);
         }
 
+        // test if game over
+        if(options.type == 'gameOver'){
+          var h2 = document.createElement('H2')
+          h2.classList.add('alert', 'alert-danger','mt-5', 'w-50', 'p-3')
+          h2.innerHTML = 'Game Over'
+          displayP.appendChild(h2)
+        } 
+        
         if (options.type == "chooseDeck") {
           // get and display starting positions template
           var temp = document.getElementsByTagName("template")[0];
@@ -230,10 +248,12 @@
           document
             .getElementById("sprinterButton")
             .addEventListener("click", handleSprinterSubmit);
-        } else {
-          var message = "something not working";
-          displayP.appendChild(document.createTextNode(message));
-        }
+        } 
+        
+        // else {
+        //   var message = "something not working";
+        //   displayP.appendChild(document.createTextNode(message));
+        // }
 
         if (options.type == 'deckReturn'){
           let handParameters = {rider: options.rider, hand: options.hand.hand}

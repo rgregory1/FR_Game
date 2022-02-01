@@ -1,4 +1,10 @@
 function testForNewTurn() {
+
+  let isGameOver = getGameOver()
+  if (isGameOver){
+    console.log('Game Over')
+    return
+  }
   
   let playerData = getPlayerData()
 
@@ -15,8 +21,10 @@ function testForNewTurn() {
   let stillToPlay = playerData.filter(x => x.turn == currentGameTurn)
 
   if(stillToPlay.length == 0){
+
     endOfTurn()
     initiateGameTurn()
+
   }else {
     console.log('still wating for players')
   }
@@ -35,6 +43,7 @@ function initiateGameTurn() {
   let turnReportObject = getLastSummaryLine()
 
   let turnReportArray =[]
+  let isGameOver = false 
 
   turnReportObject.forEach(line => {
     
@@ -52,10 +61,23 @@ function initiateGameTurn() {
       thisLine.push(line.exhaustion)
     }else thisLine.push('')
 
+     if('place' in line){
+      thisLine.push(line.place)
+      isGameOver = true
+    }else thisLine.push('')
+
     turnReportArray.push(thisLine)
   })
 
+  // get variables for email
+  let gameName = getGameName()
+  let emailTitle = `${gameName} - Play turn ${nextGameTurn}` 
 
+  if(isGameOver){
+    emailTitle = `${gameName} - A Rider Has Crossed The Finish` 
+
+    setGameOver()
+  }
 
   playerData.forEach(player => {
 
@@ -65,14 +87,14 @@ function initiateGameTurn() {
     htmlTemplate.turnReport = turnReportArray
     htmlTemplate.gameApiLink = gameApiLink
     htmlTemplate.nextGameTurn = nextGameTurn
-    htmlTemplate.table = 'placeholder'
+    htmlTemplate.isGameOver = isGameOver
 
     let htmlForEmail = htmlTemplate.evaluate().getContent()
 
 
     MailApp.sendEmail(
       player.email,
-      `Play turn ${nextGameTurn}`,
+      emailTitle,
       '',
       {
         htmlBody: htmlForEmail

@@ -59,6 +59,9 @@
         background-color: #ffcc00;
       }
       
+      table {
+        margin-bottom: 30px;
+      }
     </style>
   </head>
   <body>
@@ -71,9 +74,10 @@
           <tr> 
             <th style="width:150px">Rider</th>
             <th style="width:75px">Card Played</th>
-            <th style="width:75px">Reduction</th>
+            <th style="width:75px">Adjustment</th>
             <th style="width:75px">Draft</th>
-            <th style="width:75px">Exhaustion</th> 
+            <th style="width:75px">Exhaustion</th>
+            <th style="width:75px">Place</th>  
           </tr>
         </thead>
           <tbody>
@@ -84,17 +88,34 @@
             <td style="text-align:center"><?= line[2] ?></td>
             <td style="text-align:center"><?= line[3] ?></td>
             <td style="text-align:center"><?= line[4] ?></td>
+            <td style="text-align:center"><?= line[5] ?></td>
           </tr>
           <? }) ?>
         </tbody>
       </table>
-    <p>Click below to play your cards.</p>
+
+    <? if (isGameOver) { ?>
+
+      <p>Click below to see final postions.</p>
     
-    <p>
-    <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
-        Play Now
-    </a>
-    </p>
+      <p>
+      <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
+          See positions
+      </a>
+      </p>
+
+    <? } else { ?>
+
+        <p>Click below to play your cards.</p>
+    
+        <p>
+        <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
+            Play Now
+        </a>
+        </p>
+
+    <? } ?>
+    
 
   
    

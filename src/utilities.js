@@ -115,6 +115,21 @@ function removeStartNumbers(){
 }
 
 
+function setGameOver(){
+  baseGameInfo.getRange('B15').setValue('Yes')
+}
+
+function getGameOver(){
+  let isGameOver = baseGameInfo.getRange('B15').getValue()
+  if(isGameOver == 'Yes'){
+    return true
+  } else {
+    return false
+  }
+  
+}
+
+
 
 
 

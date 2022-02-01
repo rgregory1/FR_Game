@@ -59,11 +59,19 @@ function moveOneRider(rider, move, trackData) {
 function checkForMoveAdjustments(rider, potentialMove, trackData){
 // function checkForMoveAdjustments(rider={rider: 'GreenRoller', x:4,y:3}, potentialMove=9, trackData){
 
-
   let move = potentialMove
 
   if(trackData === undefined){
     trackData = track.getDataRange().getValues()
+  }
+
+  // check if current move takes rider past end of track, adjust if so
+  let trackMax = trackData[0].length -1
+  
+  if(rider.x + move > trackMax){
+    while(rider.x + move > trackMax){
+      --move
+    }
   }
 
   // get cell the rider is in

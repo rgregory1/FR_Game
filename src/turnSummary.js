@@ -70,6 +70,29 @@ function addOccurancesToSummary(summary = ['GreenSprinter','GreenSprinter'], typ
 }
 
 
+// placements = [{rider: 'PinkRoller', place:1},{rider: 'WhiteRoller', place:1} ]
+function addPlaceToSummary(placements){
+
+  let turnSumData = turnSum.getDataRange().getValues()
+  let thisTurnSum = turnSumData.pop()
+
+  let riderData = JSON.parse(thisTurnSum[1])
+
+  placements.forEach(placement => {
+    
+    riderData.forEach(rider => {
+      if(rider.rider == placement.rider){
+        rider.place = placement.place
+      }
+    })
+  })
+
+  let playerMoveString =  JSON.stringify(riderData)
+
+  turnSum.appendRow([thisTurnSum[0],playerMoveString])
+}
+
+
 function getLastSummaryLine(){
 
   let turnSumData = turnSum.getDataRange().getValues()
