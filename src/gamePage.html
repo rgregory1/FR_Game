@@ -120,8 +120,21 @@
         color: black;
         font-weight: bold;
       }
+
+      #deck-display {
+        background-color: #d4d4d4;
+        border-radius: 20px;
+        padding: 20px;
+      }
+
       #deck-display h4 {
         clear: both;
+        border-top: 1px solid black;
+        padding-top: 20px;
+      }
+      #deck-display h4.played-card-title{
+        border: 0;
+        padding: 0;
       }
       .game-over {
 
@@ -396,6 +409,7 @@
 
           var playedCardsTitle = document.createElement('H4')
           var playedCardsTitleText = document.createTextNode('Cards Played')
+          playedCardsTitle.classList.add("played-card-title")
           playedCardsTitle.appendChild(playedCardsTitleText)
           playedCardsDiv.appendChild(playedCardsTitle)
 

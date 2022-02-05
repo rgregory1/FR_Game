@@ -29,6 +29,9 @@ function testForNewTurn() {
   }
 }
 
+
+
+
 function initiateGameTurn() {
   
   // add one to game turn
@@ -43,6 +46,7 @@ function initiateGameTurn() {
 
   let turnReportArray =[]
   let addPlaces = false
+  
   
   let isGameOver = checkForGameOver()
 
@@ -97,6 +101,7 @@ function initiateGameTurn() {
     htmlTemplate.nextGameTurn = nextGameTurn
     htmlTemplate.isGameOver = isGameOver
     htmlTemplate.addPlaces = addPlaces
+    htmlTemplate.finishData = finishData
 
     let htmlForEmail = htmlTemplate.evaluate().getContent()
 
