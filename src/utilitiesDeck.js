@@ -40,8 +40,6 @@ function returnHand(color = 'Blue', rider = 'Roller') {
 
   // TODO save hand and new energy deck result
   status.hand = hand
-  status.phase + rider.toString().charAt(0)
-
 
   status.deck[deckIndex].energyDeck = energyDeck
 
@@ -74,9 +72,6 @@ function updatePlayerTurn(team='Black', playerData){
 function resetForNewTurn(teamColor='Blue'){
 
   let currentData = findLastMove(teamColor)
-
-  // reset phase
-  currentData.phase = 0
 
   // add choices cards to discard piles
   currentData.choice.forEach(choice => {

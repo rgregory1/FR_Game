@@ -4,6 +4,7 @@ const baseGameInfo = ss.getSheetByName("baseGameInfo");
 const db = ss.getSheetByName('db')
 const track = ss.getSheetByName('Track')
 const turnSum = ss.getSheetByName('turnSummary')
+const finish = ss.getSheetByName('finish')
 
 // const gameApiLink = baseGameInfo.getRange('B9').getValue()  // deployed game
 const gameApiLink = baseGameInfo.getRange('B10').getValue()  // dev game
@@ -87,6 +88,9 @@ function setUpGame() {
 
   // clear turn summary
   turnSum.clear()
+  finish.clear()
+  let finishHeader = [['place','rider','past finish','turn','exhaustion']]
+  finish.getRange(1,1,1,finishHeader[0].length).setValues(finishHeader)
 
   // get track for setup
   ss.deleteSheet(track)

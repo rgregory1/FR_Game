@@ -13,29 +13,38 @@ function exhaustion(){
 
   currentPositions.forEach(thisGuy => {
 
+      let isExhausted
 
       // update rider position for check
       let currentXY = getRiderXY(thisGuy.rider, trackData)
 
+      // test of rider is past finish line
+      let thisCell = trackData[currentXY.y][currentXY.x]
+      if (thisCell.split('-')[0] == 'F'){
 
-      // -------------------------  test if next square is empty
-      let nextCellx = currentXY.x + 1
-      let isExhausted
+        isExhausted = false
+        
+      } else{
+      
+        // -------------------------  test if next square is empty
+        let nextCellx = currentXY.x + 1
+        
 
-      for (let i = 0; i < trackData.length; i++){
-        let nextCell = trackData[i][nextCellx]
-        let nextCellData = nextCell.split("-")
+        for (let i = 0; i < trackData.length; i++){
+          let nextCell = trackData[i][nextCellx]
+          let nextCellData = nextCell.split("-")
 
-        if(nextCellData[0] == 'B'){
-          console.log('border')
-        } else if(nextCellData[1] == ''){
-          console.log('clear cell')
-          isExhausted = true
-        } else {
-          console.log('blocked')
-          isExhausted = false
+          if(nextCellData[0] == 'B'){
+            console.log('border')
+          } else if(nextCellData[1] == ''){
+            console.log('clear cell')
+            isExhausted = true
+          } else {
+            console.log('blocked')
+            isExhausted = false
+          }
+            
         }
-          
       }
 
       // add exhaustion to rider recycle deck
@@ -43,6 +52,10 @@ function exhaustion(){
         addExhaustion(thisGuy.rider)
         exhaustionSummary.push(thisGuy.rider)
       }
+      
+
+
+     
       
   })
 
@@ -91,102 +104,112 @@ function draftPhase(){
     let draftCount = 0
 
     currentPositions.forEach(thisGuy => {
-      let draftBlockers = ['I','C']
 
-      // update rider position for check
-      let currentXY = getRiderXY(thisGuy.rider, trackData)
+      // check for end of track
+      let endOfDraft = trackData[0].length - 2
+      if(thisGuy.x < endOfDraft){
+        
+        let draftBlockers = ['I','C']
 
-      // test current square for Incline or Cobbles
-      let thisCell = trackData[currentXY.y][currentXY.x]
-      let isClear = draftBlockers.indexOf(thisCell.split('-')[0]) == -1
-      if(isClear) {
-        console.log('the riders space is clear')
-      }
+        // update rider position for check
+        let currentXY = getRiderXY(thisGuy.rider, trackData)
 
-      // -------------------------  test if next square is empty
-      let nextCellx = currentXY.x + 1
-      let isNextCellClear
-
-      for (let i = 0; i < trackData.length; i++){
-        let nextCell = trackData[i][nextCellx]
-        let nextCellData = nextCell.split("-")
-
-        let isNextClear = draftBlockers.indexOf(nextCellData[0]) == -1
-
-        if(nextCellData[0] == 'B'){
-          console.log('border')
-        } else if(isNextClear && nextCellData[1] == ''){
-          console.log('clear cell')
-          isNextCellClear = true
-        } else {
-          console.log('blocked')
-          isNextCellClear = false
+        // test current square for Incline or Cobbles
+        let thisCell = trackData[currentXY.y][currentXY.x]
+        let isClear = draftBlockers.indexOf(thisCell.split('-')[0]) == -1
+        if(isClear) {
+          console.log('the riders space is clear')
         }
-          
-      }
 
-      // -------------------------  test if square + 2 is empty
-      let twoCellx = currentXY.x + 2
-      let isTwoCellOccupied
+        // -------------------------  test if next square is empty
+        let nextCellx = currentXY.x + 1
+        let isNextCellClear
 
-      for (let i = 0; i < trackData.length; i++){
-        let twoCell = trackData[i][twoCellx]
-        let twoCellData = twoCell.split("-")
+        for (let i = 0; i < trackData.length; i++){
+          let nextCell = trackData[i][nextCellx]
+          let nextCellData = nextCell.split("-")
 
-        let isTwoClear = draftBlockers.indexOf(twoCellData[0]) == -1
+          let isNextClear = draftBlockers.indexOf(nextCellData[0]) == -1
 
-        if(twoCellData[0] == 'B'){
-          console.log('border')
-        } else if(isTwoClear){
-            if(twoCellData[1] !== ''){
-            console.log('flat and occupied')
-            isTwoCellOccupied = true
+          if(nextCellData[0] == 'B'){
+            console.log('border')
+          } else if(isNextClear && nextCellData[1] == ''){
+            console.log('clear cell')
+            isNextCellClear = true
           } else {
-            console.log('no drafter')
+            console.log('blocked')
+            isNextCellClear = false
+          }
+            
+        }
+
+        // -------------------------  test if square + 2 is empty
+        let twoCellx = currentXY.x + 2
+        let isTwoCellOccupied
+
+        for (let i = 0; i < trackData.length; i++){
+          let twoCell = trackData[i][twoCellx]
+          let twoCellData = twoCell.split("-")
+
+          let isTwoClear = draftBlockers.indexOf(twoCellData[0]) == -1
+
+          if(twoCellData[0] == 'B'){
+            console.log('border')
+          } else if(isTwoClear){
+              if(twoCellData[1] !== ''){
+              console.log('flat and occupied')
+              isTwoCellOccupied = true
+            } else {
+              console.log('no drafter')
+              isTwoCellOccupied = false
+            }
+          } else {
+            console.log('incline or cobbles')
             isTwoCellOccupied = false
           }
-        } else {
-          console.log('incline or cobbles')
-          isTwoCellOccupied = false
+
         }
 
-      }
+        console.log(thisGuy.rider)
+        if( isClear && isNextCellClear && isTwoCellOccupied){ 
+          console.log('this guy drafts...')
 
-      console.log(thisGuy.rider)
-      if( isClear && isNextCellClear && isTwoCellOccupied){ 
-        console.log('this guy drafts...')
+          // move the rider on the track and in the trackData
+          moveOneRider(currentXY, 1, trackData)
+          draftCount++
+          riderDraftCount.push(currentXY.rider)
+          SpreadsheetApp.flush()
 
-        // move the rider on the track and in the trackData
-        moveOneRider(currentXY, 1, trackData)
-        draftCount++
-        riderDraftCount.push(currentXY.rider)
-        SpreadsheetApp.flush()
+          // test for other riders in the same square
+          let ridersInSameSquare = []
+          // find other riders in same square
+          let otherRiders = currentPositions.filter(x => x.rider !== thisGuy.rider)
 
-        // test for other riders in the same square
-        let ridersInSameSquare = []
-        // find other riders in same square
-        let otherRiders = currentPositions.filter(x => x.rider !== thisGuy.rider)
-
-        otherRiders.forEach(otherRider => {
-          if(otherRider.x == currentXY.x){
-            ridersInSameSquare.push(otherRider)
-          }
-        })
-        
-        if(ridersInSameSquare.length > 0){
-          ridersInSameSquare.forEach(otherRider => {
-            console.log('also in same square: ',otherRider.rider)
-
-            // move each rider in the square forward
-            moveOneRider(otherRider, 1, trackData)
-            riderDraftCount.push(otherRider.rider)
+          otherRiders.forEach(otherRider => {
+            if(otherRider.x == currentXY.x){
+              ridersInSameSquare.push(otherRider)
+            }
           })
+          
+          if(ridersInSameSquare.length > 0){
+            ridersInSameSquare.forEach(otherRider => {
+              console.log('also in same square: ',otherRider.rider)
+
+              // move each rider in the square forward
+              moveOneRider(otherRider, 1, trackData)
+              riderDraftCount.push(otherRider.rider)
+            })
+          }
+
+
+        } else {
+          console.log('this guy sticks')
         }
-
-
-      } else {
-        console.log('this guy sticks')
+      } else{
+        
+        console.log('too near the end to draft')
       }
+
 
     })
 
@@ -241,42 +264,7 @@ function moveAllRiders() {
       reductions.push({rider: currentRider.rider, reduction: expectedMove - finalYPosition})
     }
 
-    // // calculate where the ride should end up
-    // let potentialPosition = currentPositions[index].x + currentMove.move
-
-    // let isRiderPlaced = false
-
-    // // if space is not free, remove one row and test new row until you get to the original place
-    // for(let pp = potentialPosition; pp > currentMove.move; pp-- ){
-
-    //         // test if potential space is free
-    //         for(let i = trackData.length-1; i >= 0; i--){
-              
-    //           let cellData = trackData[i][pp].split("-")
-
-    //           if (cellData[0] !== 'B' && cellData[1] == ''){
-    //             console.log('we are good to move here: ', currentMove.rider)
-    //             console.log('Position x: ', i)
-    //             console.log('Position y: ',pp)
-
-    //             moveRiderOnTrack(i, pp, currentRider, cellData, trackData)
-
-               
-
-    //             // set outer loop to break after this
-    //             isRiderPlaced = true
-                
-    //             // stop once new position is found
-    //             break
-
-    //           } else {
-    //             console.log('space is occupied')
-    //             console.log('Position x: ', i)
-    //             console.log('Position y: ',pp)
-    //           }
-    //         }
-    //   if (isRiderPlaced) break
-    // }
+    
   })
 
   addReductionsToSummary(reductions)
@@ -357,6 +345,9 @@ function getCurrentPositions(playerData, trackData, sortType){
 
   })
 
+  // filter out removed rider data
+  currentPositions = currentPositions.filter(element => 'x' in element)
+
   if(sortType == 'draft'){
 
     // sort so upper lines are first in list, to establish left and right lane heirarchy
@@ -389,21 +380,27 @@ function getAllChoices(){
   playerData.forEach(player => {
     let thisPlayerData = findLastMove(player.team)
     console.log(thisPlayerData)
+
+    if (thisPlayerData.special.length < 2){
+      playerChoices.push(
+        {
+          rider: thisPlayerData.team + thisPlayerData.choice[0].rider, 
+          move: Number(thisPlayerData.choice[0].card.charAt(0))
+          }
+        )
+      playerChoices.push(
+        {
+          rider: thisPlayerData.team + thisPlayerData.choice[1].rider, 
+          move: Number(thisPlayerData.choice[1].card.charAt(0))
+          }
+        )
+    }
+    })
   
-    playerChoices.push(
-      {
-        rider: thisPlayerData.team + thisPlayerData.choice[0].rider, 
-        move: Number(thisPlayerData.choice[0].card.charAt(0))
-        }
-      )
-    playerChoices.push(
-      {
-        rider: thisPlayerData.team + thisPlayerData.choice[1].rider, 
-        move: Number(thisPlayerData.choice[1].card.charAt(0))
-        }
-      )
-    
-  })
+  
+
+  // filter out finished players
+  playerChoices = playerChoices.filter(x => Boolean(x.move))
 
   return playerChoices
 

@@ -223,6 +223,10 @@
       }
 
       function displayOptions(options) {
+
+        console.log('options')
+        console.log(options)
+
         var displayP = document.getElementById("displayData");
         while (displayP.hasChildNodes()) {
           displayP.removeChild(displayP.firstChild);
@@ -233,6 +237,24 @@
           var h2 = document.createElement('H2')
           h2.classList.add('alert', 'alert-danger','mt-5', 'w-50', 'p-3')
           h2.innerHTML = 'Game Over'
+          displayP.appendChild(h2)
+        } 
+
+        // test if turn played
+        if(options.type == 'finishedPlaying'){
+          var gameTurn = options.gameTurn
+          var h2 = document.createElement('H2')
+          h2.classList.add('alert', 'alert-secondary','mt-5', 'w-50', 'p-3')
+          h2.innerHTML = 'Your are finished - Turn ' + gameTurn 
+          displayP.appendChild(h2)
+        } 
+
+        // test if turn played
+        if(options.type == 'turnPlayed'){
+          var gameTurn = options.gameTurn
+          var h2 = document.createElement('H2')
+          h2.classList.add('alert', 'alert-secondary','mt-5', 'w-50', 'p-3')
+          h2.innerHTML = 'Turn ' + gameTurn + ' Played'
           displayP.appendChild(h2)
         } 
         

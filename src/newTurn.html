@@ -77,7 +77,9 @@
             <th style="width:75px">Adjustment</th>
             <th style="width:75px">Draft</th>
             <th style="width:75px">Exhaustion</th>
-            <th style="width:75px">Place</th>  
+            <? if (addPlaces) { ?> 
+              <th style="width:75px">Place</th>
+            <? } ?>
           </tr>
         </thead>
           <tbody>
@@ -88,7 +90,9 @@
             <td style="text-align:center"><?= line[2] ?></td>
             <td style="text-align:center"><?= line[3] ?></td>
             <td style="text-align:center"><?= line[4] ?></td>
-            <td style="text-align:center"><?= line[5] ?></td>
+            <? if (addPlaces) { ?> 
+              <td style="text-align:center"><?= line[5] ?></td>
+            <? } ?>
           </tr>
           <? }) ?>
         </tbody>

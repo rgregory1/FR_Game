@@ -15,7 +15,6 @@ function testForNewTurn() {
   })
 
   let currentGameTurn = getCurrentGameTurn()
-  let newTurnNeeded = false
 
   // filter out players who have already positioned for the start
   let stillToPlay = playerData.filter(x => x.turn == currentGameTurn)
@@ -43,7 +42,9 @@ function initiateGameTurn() {
   let turnReportObject = getLastSummaryLine()
 
   let turnReportArray =[]
-  let isGameOver = false 
+  let addPlaces = false
+  
+  let isGameOver = checkForGameOver()
 
   turnReportObject.forEach(line => {
     
@@ -61,9 +62,9 @@ function initiateGameTurn() {
       thisLine.push(line.exhaustion)
     }else thisLine.push('')
 
-     if('place' in line){
+    if('place' in line){
       thisLine.push(line.place)
-      isGameOver = true
+      addPlaces = true
     }else thisLine.push('')
 
     turnReportArray.push(thisLine)
@@ -73,10 +74,17 @@ function initiateGameTurn() {
   let gameName = getGameName()
   let emailTitle = `${gameName} - Play turn ${nextGameTurn}` 
 
-  if(isGameOver){
-    emailTitle = `${gameName} - A Rider Has Crossed The Finish` 
+  let finishData = getFinishData()
+  if (finishData.length > 0){
 
-    setGameOver()
+    emailTitle = `${gameName} - A Rider Has Crossed The Finish - Play turn ${nextGameTurn}`
+
+  }
+
+  if(isGameOver){
+  
+    emailTitle = `${gameName} - Game Over`
+  
   }
 
   playerData.forEach(player => {
@@ -88,6 +96,7 @@ function initiateGameTurn() {
     htmlTemplate.gameApiLink = gameApiLink
     htmlTemplate.nextGameTurn = nextGameTurn
     htmlTemplate.isGameOver = isGameOver
+    htmlTemplate.addPlaces = addPlaces
 
     let htmlForEmail = htmlTemplate.evaluate().getContent()
 
@@ -190,7 +199,13 @@ function testForLaggingPlayer() {
 //   { rider: 'BlackSprinter', move: 4, draft: 2 } ]
 
 
+function getFinishData(){
 
+  let finishData = finish.getDataRange().getValues()
+  finishData.shift() 
+  return finishData
+
+}
 
 
 
