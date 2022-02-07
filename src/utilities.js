@@ -40,9 +40,13 @@ function shuffleDeck(deck) {
   return deck;
 }
 
-function findLastMove(team='Blue') {
+function findLastMove(team='Blue', dbData) {
 
-  let dbData = getDbData()
+  if(typeof dbData == 'undefined'){
+    dbData = getDbData()
+  }
+
+  
   let reversedDbData =dbData.reverse();
   let lastMove = reversedDbData.find((each) => {
     return each[0] == team;
@@ -60,6 +64,30 @@ function findLastMove(team='Blue') {
     deck: JSON.parse(lastMove[6]),
   }
   return lastMoveObj
+}
+
+function findExhaustionCounts(){
+
+  let playerExhaustionCounts = []
+  let dbData = getDbData()
+
+  let playerData = getPlayerData()
+
+  playerData.forEach(player => {
+
+    let lastMove = findLastMove(player.team, dbData)
+
+    lastMove.deck.forEach(singleDeck => {
+
+      let exhaustionCount = [...singleDeck.energyDeck, ...singleDeck.recycle].filter(x => x == '2E').length
+
+      playerExhaustionCounts.push({rider: player.team + singleDeck.name, exhaustCount: exhaustionCount})
+    })
+
+  })
+
+  return playerExhaustionCounts
+
 }
 
 function getDbData() {

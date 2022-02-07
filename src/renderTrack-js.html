@@ -5,6 +5,7 @@
     
   })
 
+  
   function generateTable(dataArray){
     
     var tbody = document.getElementById("table-body")
@@ -24,7 +25,7 @@
         // setup class for cell
         if(cell[0] == 'B'){
           col.className = 'table-success'
-        } else if(cell[0] == 'S' || cell[0] == 'F' || cell[0] == 'C'){
+        } else if(cell[0] == 'S' || cell[0] == 'F' || cell[0] == 'C' || cell[0] == 'A'){
           col.className = 'table-warning border border-white'
         } else if(cell[0] == 'R'){
           col.className = 'table-secondary border border-white'
@@ -63,6 +64,9 @@
     })
 
     google.script.run.withSuccessHandler(displayTrackName).getTrackName()
+
+    // show exhaustion counts
+    google.script.run.withSuccessHandler(showExhaustion).findExhaustionCounts()
   }
 
   function displayTrackName(trackName){
@@ -70,5 +74,24 @@
     trackNamePara.textContent += trackName;
   }
   
+  function showExhaustion(listOfOjbects){
+
+    console.log(listOfOjbects)
+
+    listOfOjbects.forEach(element => {
+      var riderSpan = document.getElementById(element.rider)
+
+      if (riderSpan !== null){
+        riderSpan.setAttribute('data-bs-toggle', 'tooltip')
+        riderSpan.setAttribute('title', element.exhaustCount)
+
+        var tooltip = new bootstrap.Tooltip(riderSpan, {
+          boundary: document.body // or document.querySelector('#boundary')
+        })
+      }
+    })
+  
+  }
 
 </script>
+

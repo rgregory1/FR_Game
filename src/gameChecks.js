@@ -115,6 +115,9 @@ function initiateGameTurn() {
       }
     )
   })
+
+  increaseTurnForFinishedTeams(playerData)
+
 }
 
 
@@ -212,6 +215,27 @@ function getFinishData(){
 
 }
 
+function increaseTurnForFinishedTeams(playerData){
+
+  if(playerData === undefined){
+    playerData = getPlayerData()
+  }
+
+  let dbData = getDbData()
+
+  playerData.forEach(player => {
+
+    let lastMove = findLastMove(player.team, dbData)
+
+    if ( lastMove.special.length == 2){
+
+      increasePlayerGameTurn(lastMove.team)
+
+    }
+
+  })
+
+}
 
 
 

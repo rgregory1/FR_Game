@@ -184,7 +184,7 @@
         <h2 class="mb-3 mt-3">Choose <span id="rider_type"></span> Card</h2>
         
         <div class="card_options_div row">
-          <div class="col-6 form-floating">
+          <div class="col-6">
             <select
               class="form-select mb-3"
               id="card_options"
@@ -193,7 +193,7 @@
             >
               
             </select>
-            <label for="card_options">Choose card</label>
+            <!-- <label for="card_options">Choose card</label> -->
           </div>
           <div class="col-6">
             <button type="submit" class="btn btn-primary mb-3" id="submitCard">
@@ -233,6 +233,8 @@
 
         // show available energy, discard, and recycle on right side
         google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
+
+        
       }
 
       function displayOptions(options) {
@@ -448,20 +450,6 @@
           })
           deckDisplayDl.appendChild(energyDeck)
 
-          var discardDeckTitle = document.createElement('dt')
-          discardDeckTitle.classList.add("col-sm-4")
-          var discardDeckTitleContent = document.createTextNode('Discard')
-          discardDeckTitle.appendChild(discardDeckTitleContent)
-          deckDisplayDl.appendChild(discardDeckTitle)
-
-          var discardDeck = document.createElement('dd')
-          discardDeck.classList.add("col-sm-8")
-          deck.discard.forEach(card => {
-            var cardValue = document.createTextNode(card + ' ')
-            discardDeck.appendChild(cardValue)
-          })
-          deckDisplayDl.appendChild(discardDeck)
-
           var recycleDeckTitle = document.createElement('dt')
           recycleDeckTitle.classList.add("col-sm-4")
           var recycleDeckTitleContent = document.createTextNode('Recycle')
@@ -475,6 +463,20 @@
             recycleDeck.appendChild(cardValue)
           })
           deckDisplayDl.appendChild(recycleDeck)
+
+          var discardDeckTitle = document.createElement('dt')
+          discardDeckTitle.classList.add("col-sm-4")
+          var discardDeckTitleContent = document.createTextNode('Discard')
+          discardDeckTitle.appendChild(discardDeckTitleContent)
+          deckDisplayDl.appendChild(discardDeckTitle)
+
+          var discardDeck = document.createElement('dd')
+          discardDeck.classList.add("col-sm-8")
+          deck.discard.forEach(card => {
+            var cardValue = document.createTextNode(card + ' ')
+            discardDeck.appendChild(cardValue)
+          })
+          deckDisplayDl.appendChild(discardDeck)
           
           deckDisplay.appendChild(deckDisplayDl)
         })
@@ -496,15 +498,29 @@
         var startingPosHTML = temp.content.cloneNode(true);
         displayP.appendChild(startingPosHTML);
       }
+
+      
+
     </script>
 
     <?!= include("renderTrack-js"); ?>
     
 
-    <script
+    <!-- <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <script>
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+
+    </script>
+    
   </body>
 </html>

@@ -22,8 +22,6 @@ function gameLoop(team = "Pink") {
 
     let gameTurn = getCurrentGameTurn() + 1
 
-    increasePlayerGameTurn(status.team)
-
     return { type: 'finishedPlaying', gameTurn: gameTurn}
 
   }
