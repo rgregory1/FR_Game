@@ -76,7 +76,7 @@ function addExhaustion(rider='BlueSprinter'){
     }
   })
   console.log(currentTurnData)
-  // exhaustion to the reycle 
+  // exhaustion to the recycle 
 
   // update the db
   updatePlayerTurn(riderArray[0], currentTurnData)

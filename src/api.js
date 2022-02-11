@@ -6,10 +6,17 @@ function doGet(e) {
   let lastMove = findLastMove(color)
 
   if (lastMove.turn == -1){
+
     return loadStartPage(color);
-  }
-  else {
+
+  } else if (lastMove.turn == 'B'){
+
+    return loadBreakawayPage(color)
+  
+  } else {
+  
     return loadGamePage(color);
+  
   }
   
 }
@@ -22,6 +29,21 @@ function loadStartPage(color){
 
   page.color = color;
 
+  let finalPage = page
+    .evaluate()
+    .addMetaTag("viewport", "width=device-width, initial-scale=1")
+    .setTitle("FR Game - " + gameName);
+
+  return finalPage;
+}
+
+function loadBreakawayPage(color){
+  let page = HtmlService.createTemplateFromFile("breakawayPage");
+
+  let gameName = getGameName()
+  
+  page.color = color;
+  
   let finalPage = page
     .evaluate()
     .addMetaTag("viewport", "width=device-width, initial-scale=1")

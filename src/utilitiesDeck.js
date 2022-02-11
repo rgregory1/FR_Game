@@ -1,4 +1,4 @@
-function returnHand(color = 'Blue', rider = 'Roller') {
+function returnHand(color = 'Pink', rider = 'Roller') {
   let status = findLastMove(color)
 
   let energyDeck, hand, deckIndex 
@@ -12,9 +12,9 @@ function returnHand(color = 'Blue', rider = 'Roller') {
 
   // grab four cards if there are four cards
   if(energyDeck.length >= 4){
-    hand = {rider: rider, hand: energyDeck.splice(0,4)}
+    hand = {rider: rider, hand: energyDeck.splice(0,4).sort()}
   } else if (status.deck[deckIndex].recycle.length == 0){
-    hand = {rider: rider, hand: [...energyDeck]}
+    hand = {rider: rider, hand: [...energyDeck].sort()}
     energyDeck = []
   } else if (energyDeck.length == 0 && status.deck[deckIndex].recycle.length == 0){
     hand = {rider: rider, hand: ['2E']}
@@ -31,21 +31,19 @@ function returnHand(color = 'Blue', rider = 'Roller') {
     // add remaining of 4 cards to hand
     let remainingCurrentHand = energyDeck.splice(0,4-currentHandLength)
 
-    hand = {rider: rider, hand: [...currentHand, ...remainingCurrentHand]}
+    hand = {rider: rider, hand: [...currentHand, ...remainingCurrentHand].sort()}
   }
 
 
   console.log("hand", hand)
   console.log('energyDeck', energyDeck)
 
-  // TODO save hand and new energy deck result
+  // update hand and energy deck
   status.hand = hand
-
   status.deck[deckIndex].energyDeck = energyDeck
+    
 
   // return hand to page
-
-  console.log(status.deck[deckIndex].energyDeck)
   updatePlayerTurn(color, status)
 
   return hand // {rider: rider, hand: hand}
@@ -60,7 +58,7 @@ function updatePlayerTurn(team='Black', playerData){
     playerData.team,
     JSON.stringify(playerData.special),
     playerData.turn,
-    playerData.phase,
+    JSON.stringify(playerData.phase),
     JSON.stringify(playerData.hand),
     JSON.stringify(playerData.choice),
     JSON.stringify(playerData.deck)

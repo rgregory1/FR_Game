@@ -40,30 +40,73 @@ function shuffleDeck(deck) {
   return deck;
 }
 
-function findLastMove(team='Blue', dbData) {
+function findLastMove(team='Pink', dbData) {
 
   if(typeof dbData == 'undefined'){
     dbData = getDbData()
   }
 
-  
-  let reversedDbData =dbData.reverse();
-  let lastMove = reversedDbData.find((each) => {
-    return each[0] == team;
-  });
+  // let reversedDbData = dbData.reverse();
+  // let lastMove = reversedDbData.find((each) => {
+  //   return each[0] == team;
+  // });
 
-  // console.log(lastMove)
+  let lastMove
+
+  for (var i = dbData.length - 1; i >= 0; i--){
+    console.log(i)
+    if(dbData[i][0] == team){
+      lastMove = dbData[i]
+      break
+    }
+  }
+
+  console.log(lastMove)
 
   let lastMoveObj ={
     team: lastMove[0],
     special: JSON.parse(lastMove[1]),
     turn: lastMove[2],
-    phase: lastMove[3],
+    phase: JSON.parse(lastMove[3]),
     hand: JSON.parse(lastMove[4]),
     choice: JSON.parse(lastMove[5]),
     deck: JSON.parse(lastMove[6]),
   }
   return lastMoveObj
+}
+
+function getAllLastMoves(){
+
+  let dbData = getDbData()
+  let playerData = getPlayerData()
+  let allMoves = []
+
+  // let reversedDbData = dbData.reverse();
+
+  playerData.forEach(player => {
+
+    let lastMove = findLastMove(player.team, dbData)
+
+    // let lastMove = reversedDbData.find((each) => {
+    //   return each[0] == player.team;
+    // })
+
+    // let lastMoveObj ={
+    //   team: lastMove[0],
+    //   special: JSON.parse(lastMove[1]),
+    //   turn: lastMove[2],
+    //   phase: lastMove[3],
+    //   hand: JSON.parse(lastMove[4]),
+    //   choice: JSON.parse(lastMove[5]),
+    //   deck: JSON.parse(lastMove[6]),
+    // }
+
+    allMoves.push(lastMove)
+
+  })
+  
+  return allMoves
+
 }
 
 function findExhaustionCounts(){

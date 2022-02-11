@@ -5,19 +5,27 @@ function testForNewTurn() {
     console.log('Game Over')
     return
   }
-  
-  let playerData = getPlayerData()
 
-  // add turn data to each player
-  playerData.forEach(player => {
-    let playerData = findLastMove(player.team)
-    player.turn = playerData.turn
-  })
+  let allPlayerData = getAllLastMoves()
+
+
+  // let isBreakAway = getBreakAwayStatus()
+  // if (isBreakAway){
+
+  // }
+  
+  // let playerData = getPlayerData()
+
+  // // add turn data to each player
+  // playerData.forEach(player => {
+  //   let playerData = findLastMove(player.team)
+  //   player.turn = playerData.turn
+  // })
 
   let currentGameTurn = getCurrentGameTurn()
 
   // filter out players who have already positioned for the start
-  let stillToPlay = playerData.filter(x => x.turn == currentGameTurn)
+  let stillToPlay = allPlayerData.filter(x => x.turn == currentGameTurn)
 
   if(stillToPlay.length == 0){
 

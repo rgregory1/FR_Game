@@ -7,6 +7,7 @@ function gameLoop(team = "Pink") {
   }
 
   let status = findLastMove(team);
+  let isBreakAway = getBreakAwayStatus()
 
   // check if turn has been played
   if ( status.choice.length == 2){
@@ -17,7 +18,7 @@ function gameLoop(team = "Pink") {
 
   }
 
-  // check if turn has been played
+  // check if player has two riders past finish
   if ( status.special.length == 2){
 
     let gameTurn = getCurrentGameTurn() + 1
@@ -44,17 +45,13 @@ function gameLoop(team = "Pink") {
           }
   }
 
-  // check if rider is finished
-  if (status.special.length == 0){
 
-    // check if rider hasn't choosen a rider yet
-    if (status.choice.length == 0 && JSON.stringify(status.hand) === '{}'){
-      return { type: "chooseDeck"};
-    }
+  // check if rider hasn't choosen a rider yet
+  if (status.choice.length == 0 && JSON.stringify(status.hand) === '{}'){
+    return { type: "chooseDeck"};
+  }
 
     
-
-  }
 
   if (status.special.length == 1){
 
@@ -81,7 +78,7 @@ function gameLoop(team = "Pink") {
 }
 
 
-function sendCardChoice(card = '4R', teamColor="Pink", rider='Roller'){
+function sendCardChoice(card = '3S', teamColor="White", rider='Sprinter'){
 
   let deckNumber, nextRider
 
@@ -98,9 +95,11 @@ function sendCardChoice(card = '4R', teamColor="Pink", rider='Roller'){
     data.choice = [{rider: rider, card: card}]
   }
 
-  if (rider == 'Roller'){
-    deckNumber = 0
-  } else deckNumber = 1
+  // if (rider == 'Roller'){
+  //   deckNumber = 0
+  // } else deckNumber = 1
+
+  deckNumber = data.deck.findIndex(x => x.name == rider)
 
   data.deck[deckNumber].recycle = [ ...data.deck[deckNumber].recycle, ...data.hand.hand]
   data.hand = {}

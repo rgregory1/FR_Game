@@ -165,7 +165,7 @@
     </div> <!-- end container -->
 
     <template>
-      <h2 class="mb-3 mt-3">Choose First Rider to Play</h2>
+      <h2 class="mb-3 mt-3">Choose Which Rider Will Be Your Breakaway Rider</h2>
       <div>
         <div class="col-auto">
           <button type="submit" class="btn btn-primary mb-3" id="rollerButton">
@@ -236,7 +236,7 @@
         console.log("team: ", team);
 
         // determing what to show as far as cards to pick
-        google.script.run.withSuccessHandler(displayOptions).gameLoop(team);
+        google.script.run.withSuccessHandler(displayOptions).breakawayLoop(team);
 
         // show available energy, discard, and recycle on right side
         google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
@@ -307,13 +307,13 @@
 
       function handleRollerSubmit() {
           
-          google.script.run.withSuccessHandler(displayCardOptions).returnHand(team, 'Roller')
+          google.script.run.withSuccessHandler(displayCardOptions).returnBreakawayHand(team, 'Roller')
           return;
         }
       
         function handleSprinterSubmit() {
 
-          google.script.run.withSuccessHandler(displayCardOptions).returnHand(team, 'Sprinter')
+          google.script.run.withSuccessHandler(displayCardOptions).returnBreakawayHand(team, 'Sprinter')
           return;
         }
 
@@ -410,7 +410,7 @@
         }
         
         console.log(cardChoice.value)
-        google.script.run.withSuccessHandler(displayCardOptions).sendCardChoice(cardChoice.value, teamColor, riderType);
+        google.script.run.withSuccessHandler(displayCardOptions).sendBreakawayCardChoice(cardChoice.value, teamColor, riderType);
         
         // displaySuccessMessage()
       }

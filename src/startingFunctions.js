@@ -68,6 +68,8 @@ function sendStartingPos(parameter = {sprinter: 1,roller: 3, teamColor: 'Black'}
 
 function emailNextTeam(){
 
+  let isBreakAway = getBreakAwayStatus()
+
   let allPlayerData = getPlayerData()
 
   // add turn data to each player
@@ -101,6 +103,11 @@ function emailNextTeam(){
         htmlBody: htmlForEmail
       }
     )
+  } else if (isBreakAway){
+
+    console.log('It is break away time')
+    initiateBreakaway()
+
   } else {
 
     removeStartNumbers()

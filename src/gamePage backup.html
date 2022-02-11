@@ -136,9 +136,8 @@
         border: 0;
         padding: 0;
       }
-      .card_options_div .btn-group label {
-        padding-left: 25px;
-        padding-right: 25px;
+      .game-over {
+
       }
     </style>
     <title>Hello, world!</title>
@@ -186,24 +185,18 @@
         
         <div class="card_options_div row">
           <div class="col-6">
-
-            <div class="btn-group btn-group-lg" id="card_options" role="group" aria-label="Basic radio toggle button group" required>
-            </div>
-
-
-            <!-- <select
+            <select
               class="form-select mb-3"
               id="card_options"
               aria-label="card_options"
               required
             >
               
-            </select> -->
-
+            </select>
             <!-- <label for="card_options">Choose card</label> -->
           </div>
           <div class="col-6">
-            <button type="submit" class="btn btn-secondary mb-3 btn-lg" id="submitCard">
+            <button type="submit" class="btn btn-primary mb-3" id="submitCard">
               Submit Card
             </button>
           </div>
@@ -353,26 +346,10 @@
         var cardOptions = document.getElementById("card_options");
         
 
-        parameter.hand.forEach((card, i) => {
-          var radioButton = document.createElement('input')
-          radioButton.type = 'radio'
-          radioButton.value = card
-          radioButton.name = 'card-picker'
-          radioButton.id = 'card-' + i
-          radioButton.setAttribute("class", "btn-check")
-          radioButton.setAttribute("autocomplete", "off")
-
-          var radioLabel = document.createElement('label')
-          radioLabel.htmlFor = 'card-' + i
-          var description = document.createTextNode(card);
-          radioLabel.appendChild(description);
-          radioLabel.setAttribute("class", "btn btn-outline-secondary")
-
-          cardOptions.appendChild(radioButton);
-          cardOptions.appendChild(radioLabel);
-          // var option = document.createElement("option");
-          // option.textContent = card;
-          // cardOptions.appendChild(option);
+        parameter.hand.forEach((card) => {
+          var option = document.createElement("option");
+          option.textContent = card;
+          cardOptions.appendChild(option);
         });
         
         parameter.hand.forEach((card) => {
@@ -392,8 +369,7 @@
       }
 
       function handleSubmitCard() {
-        // var cardChoice = document.getElementById("card_options");
-        var cardChoice = document.querySelector('input[name="card-picker"]:checked')
+        var cardChoice = document.getElementById("card_options");
         var teamColor = document.getElementById("team").textContent;
         var riderType = document.getElementById("rider_type").textContent
 
