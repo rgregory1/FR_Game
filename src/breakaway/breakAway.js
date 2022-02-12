@@ -168,9 +168,99 @@ function checkForBreakawayCompletion(){
     } else {    
 
         console.log('process second round')
-    } 
+      
+        let breakawayResults = []
+        let breakawayResultsUnsorted = []
+
+        allTurnData.forEach(line => {
+
+          // TODO sort this array with winners at top
+          breakawayResultsUnsorted.push(
+                                [
+                                  line.team,
+                                  line.choice[0].rider,
+                                  line.choice[0].card.charAt(0),
+                                  line.choice[1].card.charAt(0),
+                                  Number(line.choice[0].card.charAt(0)) + Number(line.choice[1].card.charAt(0))
+                                ])
+        })
+
+        let allPlayerData = getPlayerData()
+        let trackData = getTrackData()
+
+        // incase of tie arrange riders in order from back left to front right 
+        let currentPositions = getCurrentPositions(allPlayerData, trackData, 'breakaway')
+
+        // create new array so when sorted by value back to front order is maintained
+        currentPositions.forEach(position => {
+          let thisRider = breakawayResultsUnsorted.find(x => x[0] + x[1] == position.rider)
+          if(thisRider){
+            breakawayResults.push(thisRider)
+          }
+          
+        })
+
+        // arrange so top bids are first
+        breakawayResults.sort((firstItem, secondItem) => secondItem[4] - firstItem[4])
+ 
+        // get number of winning riders
+        let winningSpots = getBreakAwaySpots()
+        let winners = breakawayResults.slice(0,winningSpots)
+        let winnerList = []
+        
+        winners.forEach(winner => {
+          winnerList.push(winner[0] + winner[1])
+        })
+
+        winners.forEach((winner, i) => {
+          
+          // TODO update rider deck
+          processBreakAwayWinnerCards(winner[0], winner[1])
+
+          // TODO move rider
+          moveWinningBreakawayRider(winner[0]+winner[1], i + 1, trackData)
+
+        })
+        
+        // put cards back in, combine, and shufffle decks
+        resetDecksAfterBreakaway()
+
+        allTurnData.forEach(turn => {
+
+          let thisPlayer = allPlayerData.find(x => x.team == turn.team)
+
+          // notify players
+          let emailTitle = `${turn.team} - Second Round Breakaway Bid Results`
+      
+          let htmlTemplate = HtmlService.createTemplateFromFile('breakawayEmail')
+
+          htmlTemplate.player = turn
+          htmlTemplate.turnReport = breakawayResults
+          htmlTemplate.gameApiLink = gameApiLink
+          htmlTemplate.message = 'Breakaway Bidding Has Finished'
+          htmlTemplate.isFirstRound = false
+          htmlTemplate.winnerList = winnerList
+
+          let htmlForEmail = htmlTemplate.evaluate().getContent()
+
+
+          MailApp.sendEmail(
+            thisPlayer.email,
+            emailTitle,
+            '',
+            {
+              htmlBody: htmlForEmail
+            }
+          )
+      })
+
+    setBreakawayCounterToZero()
 
     return
+  
+    } 
+
+    
   }
 
 
@@ -192,7 +282,7 @@ function checkForBreakawayCompletion(){
                             [
                               line.team,
                               line.choice[0].rider,
-                              line.choice[0].card
+                              line.choice[0].card.charAt(0)
                             ])
     })
 
@@ -206,18 +296,22 @@ function checkForBreakawayCompletion(){
       let thisPlayer = allPlayerData.find(x => x.team == turn.team)
 
       // notify players
+      let emailTitle = `${turn.team} - First Round Breakaway Bid Results`
+  
       let htmlTemplate = HtmlService.createTemplateFromFile('breakawayEmail')
 
       htmlTemplate.player = turn
       htmlTemplate.turnReport = breakawayResults
       htmlTemplate.gameApiLink = gameApiLink
-      htmlTemplate.nextGameTurn = 'Second Breakaway Bid'
+      htmlTemplate.message = 'Choose Your Second Breakaway Bid'
+      htmlTemplate.isFirstRound = true
+      htmlTemplate.winnerList = []
 
       let htmlForEmail = htmlTemplate.evaluate().getContent()
 
 
       MailApp.sendEmail(
-        player.email,
+        thisPlayer.email,
         emailTitle,
         '',
         {
@@ -232,7 +326,7 @@ function checkForBreakawayCompletion(){
 
 
 
-
+// nutty comment
 
 
 

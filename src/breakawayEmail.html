@@ -65,21 +65,28 @@
     </style>
   </head>
   <body>
-    <h2><?= player.team ?> Team Play Round <?= nextGameTurn ?></h2>
+    <h2><?= player.team ?> Team - <?= message ?></h2>
 
-    <p>Last turn summary:</p>
+    <? if (!isFirstRound) { ?>
+
+        <p>In the breakaway is:</p>
+
+      <? winnerList.forEach(winner => { ?>
+        <p><strong><?= winner ?></strong></p>
+      <? }) ?>
+
+    <? } ?>
+
+    <p>Bid summary:</p>
 
     <table class="GeneratedTable">
         <thead>
           <tr> 
-            <th style="width:150px">Rider</th>
-            <th style="width:75px">Card Played</th>
-            <th style="width:75px">Adjustment</th>
-            <th style="width:75px">Draft</th>
-            <th style="width:75px">Exhaustion</th>
-            <? if (addPlaces) { ?> 
-              <th style="width:75px">Place</th>
-            <? } ?>
+            <th style="width:150px">Team</th>
+            <th style="width:75px">Breakaway Rider</th>
+            <th style="width:75px">1st Bid</th>
+            <th style="width:75px">2nd Bid</th>
+            <th style="width:75px">Total</th>
           </tr>
         </thead>
           <tbody>
@@ -90,32 +97,29 @@
             <td style="text-align:center"><?= line[2] ?></td>
             <td style="text-align:center"><?= line[3] ?></td>
             <td style="text-align:center"><?= line[4] ?></td>
-            <? if (addPlaces) { ?> 
-              <td style="text-align:center"><?= line[5] ?></td>
-            <? } ?>
           </tr>
           <? }) ?>
         </tbody>
       </table>
 
-    <? if (isGameOver) { ?>
+    <? if (isFirstRound) { ?>
 
-      <p>Click below to see final postions.</p>
+      <p>Click below to make second bid.</p>
     
       <p>
       <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
-          See positions
+          Second Round
       </a>
       </p>
 
     <? } else { ?>
 
-        <p>Click below to play your cards.</p>
+        <p>Click below to play your cards and begin the race.</p>
     
         <p>
-        <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
-            Play Now
-        </a>
+          <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
+              Play Now
+          </a>
         </p>
 
     <? } ?>

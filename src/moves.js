@@ -363,6 +363,13 @@ function getCurrentPositions(playerData, trackData, sortType){
     // sort so lead riders are first in list
     currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
 
+  } else if (sortType == 'breakaway'){
+
+    // sort so higher lines are first in list, to establish left and right lane heirarchy
+    currentPositions.sort((firstItem, secondItem) => secondItem.y - firstItem.y)
+    // sort so lead riders are first in list
+    currentPositions.sort((firstItem, secondItem) => secondItem.x - firstItem.x)
+    currentPositions.reverse()
   }
 
   return currentPositions
