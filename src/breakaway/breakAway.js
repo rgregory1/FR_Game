@@ -113,7 +113,7 @@ function returnBreakawayHand(color = 'Pink', rider = 'Roller') {
   return hand // {rider: rider, hand: hand}
 }
 
-function sendBreakawayCardChoice(card = '3R', teamColor="Pink", rider='Roller'){
+function sendBreakawayCardChoice(card = '5R', teamColor="White", rider='Roller'){
 
   let deckNumber, nextRider
 
@@ -255,6 +255,7 @@ function checkForBreakawayCompletion(){
       })
 
     setBreakawayCounterToZero()
+    removeStartNumbers()
 
     return
   
@@ -326,7 +327,7 @@ function checkForBreakawayCompletion(){
 
 
 
-// nutty comment
+
 
 
 

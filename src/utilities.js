@@ -1,11 +1,11 @@
 
-/*
- *  returns team data from baseGameInfo sheet
- *  returns all the teams' data if you don't enter a team color
- *  returns only one team if you enter a color
+/**
+ *  retrieves player data
+ *  @param {String} team - optional parameter if you want to return a single team
+ *  @return {Array of Objects} team data from baseGameInfo sheet
  */
 function getPlayerData(team) {
-  let rawData = baseGameInfo.getRange(2, 1, 6, 4).getValues();
+  let rawData = baseGameInfo.getRange(2, 1, 6, 7).getValues();
 
   let playerData = [];
 
@@ -16,6 +16,9 @@ function getPlayerData(team) {
         team: player[1],
         teamName: player[2],
         email: player[3],
+        tourPoints: (player[4] == '') ? 0 : player[4],
+        deck1Ex: (player[5] == '') ? 0 : player[5],
+        deck2Ex: (player[6] == '') ? 0 : player[6]
       });
     }
   });
@@ -25,9 +28,15 @@ function getPlayerData(team) {
   }
   console.log(playerData);
   return playerData;
-  // return "two";
+  
 }
 
+
+/**
+ * shuffles a specific deck
+ * @param {Array<strings>} deck - enter deck to be shuffled
+ * @return {[string,string,string]} deck - randomized deck
+ */
 function shuffleDeck(deck) {
   // shuffle the cards
   for (let i = deck.length - 1; i > 0; i--) {
@@ -40,16 +49,17 @@ function shuffleDeck(deck) {
   return deck;
 }
 
+/**
+ * find last move off single team
+ * @param {string} team - team name
+ * @param {Array of Arrays} dbData - optional, the entire database data
+ * @return {Object} lastMoveObj - ann object containing all the data from the teams last move
+ */
 function findLastMove(team='Pink', dbData) {
 
   if(typeof dbData == 'undefined'){
     dbData = getDbData()
   }
-
-  // let reversedDbData = dbData.reverse();
-  // let lastMove = reversedDbData.find((each) => {
-  //   return each[0] == team;
-  // });
 
   let lastMove
 
@@ -75,6 +85,10 @@ function findLastMove(team='Pink', dbData) {
   return lastMoveObj
 }
 
+/**
+ * get all last moves of each team
+ * @return {Array of Objects} allMoves - each players turn object in a list
+ */
 function getAllLastMoves(){
 
   let dbData = getDbData()
@@ -87,20 +101,6 @@ function getAllLastMoves(){
 
     let lastMove = findLastMove(player.team, dbData)
 
-    // let lastMove = reversedDbData.find((each) => {
-    //   return each[0] == player.team;
-    // })
-
-    // let lastMoveObj ={
-    //   team: lastMove[0],
-    //   special: JSON.parse(lastMove[1]),
-    //   turn: lastMove[2],
-    //   phase: lastMove[3],
-    //   hand: JSON.parse(lastMove[4]),
-    //   choice: JSON.parse(lastMove[5]),
-    //   deck: JSON.parse(lastMove[6]),
-    // }
-
     allMoves.push(lastMove)
 
   })
@@ -109,30 +109,70 @@ function getAllLastMoves(){
 
 }
 
+/**
+ * updates the data for current player
+ * @param {String} team - team name
+ * @param {Object} playerData - object with one teams current turn
+ */
+function updatePlayerTurn(team='Black', playerData){
+
+   db.appendRow([
+    playerData.team,
+    JSON.stringify(playerData.special),
+    playerData.turn,
+    JSON.stringify(playerData.phase),
+    JSON.stringify(playerData.hand),
+    JSON.stringify(playerData.choice),
+    JSON.stringify(playerData.deck)
+   ])
+
+
+}
+
+/**
+ * returns each riders exhaustion and play status to webpage for display
+ * @return {Object} object - exhaustion and which players have played
+ */
 function findExhaustionCounts(){
 
   let playerExhaustionCounts = []
-  let dbData = getDbData()
+  let playersPlayed = []
+  let currentGameTurn = getCurrentGameTurn()
 
-  let playerData = getPlayerData()
+  let allLastMoves = getAllLastMoves()
 
-  playerData.forEach(player => {
-
-    let lastMove = findLastMove(player.team, dbData)
+  allLastMoves.forEach(lastMove => {
 
     lastMove.deck.forEach(singleDeck => {
 
       let exhaustionCount = [...singleDeck.energyDeck, ...singleDeck.recycle].filter(x => x == '2E').length
 
-      playerExhaustionCounts.push({rider: player.team + singleDeck.name, exhaustCount: exhaustionCount})
+      // test for exhaustion card in choice
+      lastMove.choice.forEach(choiceObj => {
+        if (choiceObj.rider == singleDeck.name && choiceObj.card == '2E'){
+          ++exhaustionCount
+        }
+      })
+
+      playerExhaustionCounts.push({rider: lastMove.team + singleDeck.name, exhaustCount: exhaustionCount})
+
     })
 
+    if (lastMove.turn > currentGameTurn){
+
+      playersPlayed.push(lastMove.team)
+      
+    }
   })
 
-  return playerExhaustionCounts
+  return {exhaustion: playerExhaustionCounts, playersPlayed: playersPlayed}
 
 }
 
+/**
+ * returns the contents of the DB
+ * @return {Array of Arrays} dbData - returns all DB data
+ */
 function getDbData() {
   let dbData = db.getDataRange().getValues()
   dbData.shift()
@@ -149,10 +189,11 @@ function getCurrentGameTurn(){
   return baseGameInfo.getRange('B11').getValue()
 }
 
-function getApiUrl(){
-  let apiLink = ScriptApp.getService().getUrl()
-  console.log(apiLink)
-}
+// function getApiUrl(){
+//   let apiLink = ScriptApp.getService().getUrl()
+//   console.log(apiLink)
+// }
+
 
 function getGameName(){
   let gameName = baseGameInfo.getRange('B12').getValue()
@@ -162,9 +203,13 @@ function getGameName(){
 
 function getTrackName(){
   let trackName = baseGameInfo.getRange('B17').getValue()
-  return trackName
+  let raceName = baseGameInfo.getRange('B12').getValue()
+  return {trackName: trackName, raceName: raceName}
 }
 
+/**
+ * removes the numbers from the track after setup is complete
+ */
 function removeStartNumbers(){
 
   let trackData = getTrackData()

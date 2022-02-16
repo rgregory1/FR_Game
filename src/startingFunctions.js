@@ -82,11 +82,16 @@ function emailNextTeam(){
   let possiblePlayers = allPlayerData.filter(x => x.turn == -1)
 
   if(possiblePlayers.length !== 0){
-    let random = Math.floor(Math.random() * possiblePlayers.length)
 
-    // get random player
-    let nextPlayer = possiblePlayers[random]
+    // randomize players
+    possiblePlayers = shuffleDeck(possiblePlayers)
+
+    // if tour points present, put them at the end in order of least to most
+    possiblePlayers.sort((firstItem, secondItem) => firstItem.tourPoints - secondItem.tourPoints)
     
+    // get random player
+    let nextPlayer = possiblePlayers[0]
+
     let htmlTemplate = HtmlService.createTemplateFromFile('playerEmail')
 
     htmlTemplate.player = nextPlayer
@@ -103,6 +108,7 @@ function emailNextTeam(){
         htmlBody: htmlForEmail
       }
     )
+
   } else if (isBreakAway){
 
     console.log('It is break away time')
@@ -137,7 +143,7 @@ function incrementPlayerTurn(team='Black'){
      playerData.team,
      JSON.stringify(playerData.special),
      playerData.turn,
-     playerData.phase,
+     JSON.stringify(playerData.phase),
      JSON.stringify(playerData.hand),
      JSON.stringify(playerData.choice),
      JSON.stringify(playerData.deck)

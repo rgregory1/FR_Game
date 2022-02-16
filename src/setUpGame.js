@@ -26,13 +26,17 @@ function onOpen(){
 /**
  * builds decs from the listed decs on lines 12,13 of the base sheet
  */
-function buildDecks() {
+function buildDecks(d1ex,d2ex) {
+
+  // get deck makeup
   let deckData = baseGameInfo.getRange(21, 1, 2, 17).getValues();
-  // console.log(deckData);
+  
+  let residualExhaustion = [Array(d1ex).fill('2E'),Array(d2ex).fill('2E')]
+
 
   let decks = [];
 
-  deckData.forEach((line) => {
+  deckData.forEach((line,i) => {
     let deck = {
       name: line.shift(),
       energyDeck: [],
@@ -46,6 +50,8 @@ function buildDecks() {
       deck.energyDeck.push(card + deckLetter);
     });
 
+    deck.energyDeck.push(...residualExhaustion[i])
+
     deck.energyDeck = shuffleDeck(deck.energyDeck);
 
     decks.push(deck);
@@ -57,10 +63,8 @@ function buildDecks() {
 }
 
 function setUpGame() {
-  // get base info from first seven rows
-  let teamData = baseGameInfo.getRange(2, 1, 6, 5).getValues();
-  teamData = teamData.filter((x) => x[3] != "");
-  console.log(teamData);
+  
+  let playerData = getPlayerData()
 
   // create db sheet for tracking game turns
   const db = ss.getSheetByName("db") || ss.insert("db");
@@ -69,15 +73,16 @@ function setUpGame() {
   db.getRange(1, 1, 1, dbheader[0].length).setValues(dbheader);
 
   // setup each team with all necessary sheets and data
-  teamData.forEach((team) => {
+  playerData.forEach((team) => {
+    
     // create decks
-    var decks = buildDecks();
+    var decks = buildDecks(team.deck1Ex, team.deck2Ex);
 
     // turn deck list of objects into strings for storage
     let deckString = JSON.stringify(decks);
 
     // add initial data to db
-    db.appendRow([team[1],JSON.stringify([]), -1, 0, JSON.stringify({}), JSON.stringify([]), deckString]);
+    db.appendRow([team.team,JSON.stringify([]), -1, JSON.stringify([]), JSON.stringify({}), JSON.stringify([]), deckString]);
   });
 
   // set game turn to -1

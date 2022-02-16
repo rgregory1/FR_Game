@@ -16,6 +16,7 @@
       div#render-track{
         overflow: auto;
         padding: 30px;
+        background: #064CDB;
       }
       table#trackTable {
         table-layout: fixed;
@@ -125,6 +126,8 @@
         background-color: #d4d4d4;
         border-radius: 20px;
         padding: 20px;
+        clear: both;
+        margin-top: 10px;
       }
 
       #deck-display h4 {
@@ -140,11 +143,25 @@
         padding-left: 25px;
         padding-right: 25px;
       }
+      /* tbody>tr>:nth-child(10){
+        border-left: 5px solid green !important;
+      } */
+      .rider-played {
+        border-radius:50%;
+        width: 20px;
+        height:20px;
+        float: left;
+        margin-right: 10px;
+      }
+      #played-list {
+        height: 30px;
+      }
     </style>
     <title>Hello, world!</title>
   </head>
   <body>
-    
+   
+        
     <?!= include("renderTrack"); ?>    
     
     <div class="container mt-3">
@@ -157,6 +174,7 @@
           <div id="displayData"></div>
         </div>
         <div class="col-sm-4">
+          <div id="played-list"></div>
           <div id="deck-display">
             
           </div>

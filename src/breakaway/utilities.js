@@ -5,14 +5,7 @@ function processBreakAwayWinnerCards(team = 'White', rider = 'Roller'){
   // get deck index
   let di = turnData.deck.findIndex(x => x.name == rider)
 
-  console.log(turnData.deck[di].energyDeck)
-
-  // let newCards = ['2E', '2E']
-
-  // // add exhaustion to energy deck
-  // turnData.deck[di].energyDeck.push(...newCards)
-
-  // turnData.deck[di].energyDeck = shuffleDeck(turnData.deck[di].energyDeck)
+  // console.log(turnData.deck[di].energyDeck)
   
   // add picked cards to discard
   let pickedCards = [turnData.choice[0].card,turnData.choice[1].card]
@@ -40,7 +33,7 @@ function resetDecksAfterBreakaway(){
     let pickedCards = [player.choice[0].card,player.choice[1].card]
 
     // combine decks again
-    player.deck[di].energyDeck.push(...player.deck[0].recycle,...pickedCards)
+    player.deck[di].energyDeck.push(...player.deck[di].recycle,...pickedCards)
     
     // reset recycle and choice
     player.deck[di].recycle = []

@@ -69,16 +69,21 @@
     google.script.run.withSuccessHandler(showExhaustion).findExhaustionCounts()
   }
 
-  function displayTrackName(trackName){
+  function displayTrackName(parameter){
+
     var trackNamePara = document.getElementById('track-name')
-    trackNamePara.textContent += trackName;
+    trackNamePara.textContent += parameter.trackName;
+
+    var raceNamePara = document.getElementById('race-name')
+    raceNamePara.textContent += parameter.raceName;
+
   }
   
-  function showExhaustion(listOfOjbects){
+  function showExhaustion(parameter){
 
-    console.log(listOfOjbects)
+    console.log(parameter)
 
-    listOfOjbects.forEach(element => {
+    parameter.exhaustion.forEach(element => {
       var riderSpan = document.getElementById(element.rider)
 
       if (riderSpan !== null){
@@ -90,8 +95,36 @@
         })
       }
     })
+
+    var playedRiders = document.getElementById('played-list')
+    
+    parameter.playersPlayed.forEach(player => {
+
+      var newSpan = document.createElement('div')
+      // newSpan.setAttribute('class', 'rider-played')
+      newSpan.classList.add('rider-played', player)
+      // newSpan.appendChild(document.createTextNode(player))
+      playedRiders.appendChild(newSpan)
+
+    })
   
   }
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

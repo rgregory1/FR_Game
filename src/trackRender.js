@@ -7,7 +7,7 @@ function getTrackData(howdy = new Date()) {
   SpreadsheetApp.flush()
   let trackData = track.getDataRange().getValues()
 
-  console.log(trackData)
+  // console.log(trackData)
   
   return(trackData)
 }

@@ -49,23 +49,7 @@ function returnHand(color = 'Pink', rider = 'Roller') {
   return hand // {rider: rider, hand: hand}
 }
 
-/**
- * updates the data for current player
- */
-function updatePlayerTurn(team='Black', playerData){
 
-   db.appendRow([
-    playerData.team,
-    JSON.stringify(playerData.special),
-    playerData.turn,
-    JSON.stringify(playerData.phase),
-    JSON.stringify(playerData.hand),
-    JSON.stringify(playerData.choice),
-    JSON.stringify(playerData.deck)
-   ])
-
-
-}
 
 function resetForNewTurn(teamColor='Blue'){
 

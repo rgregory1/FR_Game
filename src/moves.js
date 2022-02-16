@@ -261,7 +261,8 @@ function moveAllRiders() {
      // test if full move not taken
     let expectedMove = currentRider.x + currentMove.move
     if(finalYPosition !== expectedMove){
-      reductions.push({rider: currentRider.rider, reduction: expectedMove - finalYPosition})
+      // reductions.push({rider: currentRider.rider, reduction: expectedMove - finalYPosition})
+      reductions.push({rider: currentRider.rider, reduction: finalYPosition - expectedMove})
     }
 
     
