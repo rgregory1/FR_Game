@@ -13,12 +13,12 @@ function returnHand(color = 'Pink', rider = 'Roller') {
   // grab four cards if there are four cards
   if(energyDeck.length >= 4){
     hand = {rider: rider, hand: energyDeck.splice(0,4).sort()}
-  } else if (status.deck[deckIndex].recycle.length == 0){
-    hand = {rider: rider, hand: [...energyDeck].sort()}
-    energyDeck = []
   } else if (energyDeck.length == 0 && status.deck[deckIndex].recycle.length == 0){
     hand = {rider: rider, hand: ['2E']}
-  } else {
+  } else if (status.deck[deckIndex].recycle.length == 0 && energyDeck.length > 0){
+    hand = {rider: rider, hand: [...energyDeck].sort()}
+    energyDeck = []
+  }  else {
 
     // grab what is in the energy deck
     let currentHandLength = energyDeck.length

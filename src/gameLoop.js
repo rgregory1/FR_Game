@@ -36,6 +36,27 @@ function gameLoop(team = "Pink") {
     return { type: "startingPositions", positions: possiblePositions };
   }
 
+  if (status.special.length == 1){
+
+  let finishedRider = status.special[0].finish
+
+  let inPlayRiderDeck = status.deck.findIndex(x => x.name !== finishedRider)
+
+  let inPlayHand = returnHand(status.team, status.deck[inPlayRiderDeck].name)
+
+  console.log(inPlayHand.hand)
+
+  return {
+          type: 'deckReturn',
+          hand: {
+                  hand: inPlayHand.hand,
+                  rider: inPlayHand.rider
+                },
+          rider: inPlayHand.rider
+        }
+
+  }
+
   // if rider has been choose and screen refreshed return previously selected hand
   if (JSON.stringify(status.hand) !== '{}'){
     return { 
@@ -53,26 +74,7 @@ function gameLoop(team = "Pink") {
 
     
 
-  if (status.special.length == 1){
 
-    let finishedRider = status.special[0].finish
-
-    let inPlayRiderDeck = status.deck.findIndex(x => x.name !== finishedRider)
-
-    let inPlayHand = returnHand(status.team, status.deck[inPlayRiderDeck].name)
-
-    console.log(inPlayHand.hand)
-
-    return {
-            type: 'deckReturn',
-            hand: {
-                    hand: inPlayHand.hand,
-                    rider: inPlayHand.rider
-                  },
-            rider: inPlayHand.rider
-         }
-
-  }
   
   
 }
