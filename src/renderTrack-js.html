@@ -1,130 +1,102 @@
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    google.script.run.withSuccessHandler(generateTable).getTrackData();
+  });
 
-  document.addEventListener("DOMContentLoaded", function(){
-    google.script.run.withSuccessHandler(generateTable).getTrackData()
-    
-  })
-
-  
-  function generateTable(dataArray){
-    
-    var tbody = document.getElementById("table-body")
+  function generateTable(dataArray) {
+    var tbody = document.getElementById("table-body");
     while (tbody.hasChildNodes()) {
       tbody.removeChild(tbody.firstChild);
     }
 
+    dataArray.forEach((line) => {
+      var row = document.createElement("tr");
 
-    dataArray.forEach(line =>{
-      var row = document.createElement("tr")
-
-      line.forEach(cellSting => {
-
-        cell = cellSting.split("-")
-        var col = document.createElement("td")
+      line.forEach((cellSting) => {
+        cell = cellSting.split("-");
+        var col = document.createElement("td");
 
         // setup class for cell
-        if(cell[0] == 'B'){
-          col.className = 'table-success'
-        } else if(cell[0] == 'S' || cell[0] == 'F' || cell[0] == 'C' || cell[0] == 'A'){
-          col.className = 'table-warning border border-white'
-        } else if(cell[0] == 'R'){
-          col.className = 'table-secondary border border-white'
-        } else if(cell[0] == 'I'){
-          col.className = 'table-danger border border-white'
-        } else if(cell[0] == 'D'){
-          col.className = 'table-primary border border-white'
-        } else if(cell[0] == 'Z'){
-          col.className = 'table-info border border-white'
+        if (cell[0] == "B") {
+          col.className = "table-success";
+        } else if (
+          cell[0] == "S" ||
+          cell[0] == "F" ||
+          cell[0] == "C" ||
+          cell[0] == "A"
+        ) {
+          col.className = "table-warning border border-white";
+        } else if (cell[0] == "R") {
+          col.className = "table-secondary border border-white";
+        } else if (cell[0] == "I") {
+          col.className = "table-danger border border-white";
+        } else if (cell[0] == "D") {
+          col.className = "table-primary border border-white";
+        } else if (cell[0] == "Z") {
+          col.className = "table-info border border-white";
         }
 
         // create td html conent for rider
         // rider.split(/(?=[A-Z])/)
 
-        if(cell[1] !== '' && isNaN(cell[1])){
+        if (cell[1] !== "" && isNaN(cell[1])) {
+          var riderData = cell[1].split(/(?=[A-Z])/);
 
-          var riderData = cell[1].split(/(?=[A-Z])/)
+          var span = col.appendChild(document.createElement("SPAN"));
 
-          var span = col.appendChild(document.createElement('SPAN'))
+          span.className = riderData[0] + "-rider";
 
-          span.className = riderData[0] + "-rider"
+          span.setAttribute("id", cell[1]);
 
-          span.setAttribute('id',cell[1])
-
-          span.appendChild(document.createTextNode(riderData[1].charAt(0)))
-
+          span.appendChild(document.createTextNode(riderData[1].charAt(0)));
         } else {
-          col.textContent = cell[1]
+          col.textContent = cell[1];
         }
 
-        row.appendChild(col)
-      })
-      
-      
-      tbody.appendChild(row)
-    })
+        row.appendChild(col);
+      });
 
-    google.script.run.withSuccessHandler(displayTrackName).getTrackName()
+      tbody.appendChild(row);
+    });
+
+    google.script.run.withSuccessHandler(displayTrackName).getTrackName();
 
     // show exhaustion counts
-    google.script.run.withSuccessHandler(showExhaustion).findExhaustionCounts()
+    google.script.run.withSuccessHandler(showExhaustion).getExhaustionCounts();
   }
 
-  function displayTrackName(parameter){
-
-    var trackNamePara = document.getElementById('track-name')
+  function displayTrackName(parameter) {
+    var trackNamePara = document.getElementById("track-name");
     trackNamePara.textContent += parameter.trackName;
 
-    var raceNamePara = document.getElementById('race-name')
+    var raceNamePara = document.getElementById("race-name");
     raceNamePara.textContent += parameter.raceName;
-
   }
-  
-  function showExhaustion(parameter){
 
-    console.log(parameter)
+  function showExhaustion(parameter) {
+    console.log(parameter);
 
-    parameter.exhaustion.forEach(element => {
-      var riderSpan = document.getElementById(element.rider)
+    parameter.exhaustion.forEach((element) => {
+      var riderSpan = document.getElementById(element.rider);
 
-      if (riderSpan !== null){
-        riderSpan.setAttribute('data-bs-toggle', 'tooltip')
-        riderSpan.setAttribute('title', element.exhaustCount)
+      if (riderSpan !== null) {
+        riderSpan.setAttribute("data-bs-toggle", "tooltip");
+        riderSpan.setAttribute("title", element.exhaustCount);
 
         var tooltip = new bootstrap.Tooltip(riderSpan, {
-          boundary: document.body // or document.querySelector('#boundary')
-        })
+          boundary: document.body, // or document.querySelector('#boundary')
+        });
       }
-    })
+    });
 
-    var playedRiders = document.getElementById('played-list')
-    
-    parameter.playersPlayed.forEach(player => {
+    var playedRiders = document.getElementById("played-list");
 
-      var newSpan = document.createElement('div')
+    parameter.playersPlayed.forEach((player) => {
+      var newSpan = document.createElement("div");
       // newSpan.setAttribute('class', 'rider-played')
-      newSpan.classList.add('rider-played', player)
+      newSpan.classList.add("rider-played", player);
       // newSpan.appendChild(document.createTextNode(player))
-      playedRiders.appendChild(newSpan)
-
-    })
-  
+      playedRiders.appendChild(newSpan);
+    });
   }
-
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

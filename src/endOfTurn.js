@@ -1,169 +1,144 @@
 function endOfTurn() {
-
   // remove finished riders
-  removeFinishedRiders()
+  removeFinishedRiders();
 
   // initial moves
-  moveAllRiders()
+  moveAllRiders();
 
   // drafting
-  draftPhase()
+  draftPhase();
 
   // exaustion
-  exhaustion()
+  exhaustion();
 
   // check for finishers
-  checkForFinishers()
+  checkForFinishers();
 
   // check for game over
-  checkForGameOver()
+  checkForGameOver();
 }
 
-
-
-function checkForFinishers(){
-
-  let placements = []
+function checkForFinishers() {
+  let placements = [];
 
   // get track data from spreadsheet
-  let trackData = track.getDataRange().getValues()
+  let trackData = track.getDataRange().getValues();
 
   // find finish line
-  let finishLine 
-  trackData.forEach(line => {
-    let finishIndex = line.findIndex(x => x.includes('F-'))
-    if (finishIndex > -1){
-      finishLine = finishIndex - 1
-    } 
-  })
+  let finishLine;
+  trackData.forEach((line) => {
+    let finishIndex = line.findIndex((x) => x.includes("F-"));
+    if (finishIndex > -1) {
+      finishLine = finishIndex - 1;
+    }
+  });
 
-  let playerData = getPlayerData()
+  let playerData = getPlayerData();
 
   // gather xy data for each rider
-  let currentPositions = getCurrentPositions(playerData, trackData, 'movephase')
+  let currentPositions = getCurrentPositions(
+    playerData,
+    trackData,
+    "movephase"
+  );
 
   // test each rider to see if they are in a 'finish' square, if so mark
   // mark thier finish position
-  currentPositions.forEach((thisGuy,index) => {
+  currentPositions.forEach((thisGuy, index) => {
+    // test current square for Incline or Cobbles
+    let thisCell = trackData[thisGuy.y][thisGuy.x];
+    if (thisCell.split("-")[0] == "F") {
+      let exhaustionCount;
+      let nextAvailablePlace = finish.getLastRow();
 
-      // test current square for Incline or Cobbles
-      let thisCell = trackData[thisGuy.y][thisGuy.x]
-      if (thisCell.split('-')[0] == 'F'){
-        
-        let exhaustionCount
-        let nextAvailablePlace = finish.getLastRow()
+      // update deck for placement
+      let riderData = thisGuy.rider.split(/(?=[A-Z])/);
 
-        // update deck for placement
-        let riderData = thisGuy.rider.split(/(?=[A-Z])/)
+      let thisRiderData = getLastMove(riderData[0]);
 
-        let thisRiderData = findLastMove(riderData[0])
+      thisRiderData.deck.forEach((deck) => {
+        if (deck.name == riderData[1]) {
+          // add place to deck to flag rider as finished
+          deck.place = nextAvailablePlace;
 
-        thisRiderData.deck.forEach(deck => {
-          if(deck.name == riderData[1]){
+          // get total exhaustion at this point
+          exhaustionCount = [...deck.energyDeck, ...deck.recycle].filter(
+            (x) => x == "2E"
+          ).length;
+        }
+      });
 
-            // add place to deck to flag rider as finished
-            deck.place = nextAvailablePlace
+      // mark rider as finished in db
+      thisRiderData.special.push({ finish: riderData[1] });
 
-            // get total exhaustion at this point
-            exhaustionCount = [...deck.energyDeck, ...deck.recycle].filter(x => x == '2E').length
+      // update player db
+      updatePlayerTurn(riderData[0], thisRiderData);
 
-          }
-        }) 
+      let pastFinish = thisGuy.x - finishLine;
 
-        // mark rider as finished in db
-        thisRiderData.special.push({finish: riderData[1]})
+      //update finish table
+      addToPlaceTable(thisGuy.rider, pastFinish, exhaustionCount);
 
-        // update player db
-        updatePlayerTurn(riderData[0], thisRiderData)
-
-        let pastFinish = thisGuy.x - finishLine
-
-        //update finish table
-        addToPlaceTable(thisGuy.rider, pastFinish, exhaustionCount)
-
-        // update turn summary list
-        placements.push({rider: thisGuy.rider, place: nextAvailablePlace})
-      }
-      
-  })
+      // update turn summary list
+      placements.push({ rider: thisGuy.rider, place: nextAvailablePlace });
+    }
+  });
 
   // update turn summary page
-  if(placements.length !== 0){
-    addPlaceToSummary(placements)
+  if (placements.length !== 0) {
+    addPlaceToSummary(placements);
   }
-  
-
-
 }
 
-
-
-function addToPlaceTable(rider, pastFinish, exhaustionCount){
-
-  let lastRow = finish.getLastRow()
+function addToPlaceTable(rider, pastFinish, exhaustionCount) {
+  let lastRow = finish.getLastRow();
 
   finish.appendRow([
     lastRow,
     rider,
     pastFinish,
     getCurrentGameTurn(),
-    exhaustionCount
-  ])
+    exhaustionCount,
+  ]);
 
-  return lastRow // this is the finishing place
+  return lastRow; // this is the finishing place
 }
 
-function checkForGameOver(){
+function checkForGameOver() {
+  let isGameOver = false;
 
-  let isGameOver = false
+  let totalFinishers = finish.getLastRow() - 1;
 
-  let totalFinishers = finish.getLastRow() - 1
+  let numberOfRiders = getPlayerData().length * 2;
 
-  let numberOfRiders = getPlayerData().length * 2
-
-  if (totalFinishers >= numberOfRiders){
-
-    setGameOver()
-    console.log('game over')
-    isGameOver = true
-
+  if (totalFinishers >= numberOfRiders) {
+    setGameOver();
+    console.log("game over");
+    isGameOver = true;
   } else {
-    console.log('still riders to finish: ', numberOfRiders - totalFinishers)
+    console.log("still riders to finish: ", numberOfRiders - totalFinishers);
   }
 
-  return isGameOver
+  return isGameOver;
 }
 
-
-
-function removeFinishedRiders(){
-
+function removeFinishedRiders() {
   // get track data from spreadsheet
-  let trackData = track.getDataRange().getValues()
+  let trackData = track.getDataRange().getValues();
 
-  let playerData = getPlayerData()
+  let playerData = getPlayerData();
 
   // gather xy data for each rider
-  let currentPositions = getCurrentPositions(playerData, trackData)
+  let currentPositions = getCurrentPositions(playerData, trackData);
 
-  // test each rider to see if they are in a 'finish' square, if so 
+  // test each rider to see if they are in a 'finish' square, if so
   // remove them
-  currentPositions.forEach(thisGuy => {
-
-      // test current square for Incline or Cobbles
-      let thisCell = trackData[thisGuy.y][thisGuy.x]
-      if (thisCell.split('-')[0] == 'F'){
-        console.log('remove: ', thisGuy.rider)
-        track.getRange(thisGuy.y + 1,thisGuy.x + 1).setValue('F-')
-      }
-  })
+  currentPositions.forEach((thisGuy) => {
+    // test current square for Incline or Cobbles
+    let thisCell = trackData[thisGuy.y][thisGuy.x];
+    if (thisCell.split("-")[0] == "F") {
+      console.log("remove: ", thisGuy.rider);
+      track.getRange(thisGuy.y + 1, thisGuy.x + 1).setValue("F-");
+    }
+  });
 }
-
-
-
-
-
-
-
-
-

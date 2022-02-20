@@ -1,336 +1,309 @@
+/**
+ * begin breakaway, set turn for all players and notify to pick first card
+ */
 function initiateBreakaway() {
-  
-  let playerData = getPlayerData()
+  let playerData = getPlayerData();
 
-  let allLastMoves = getAllLastMoves()
+  let allLastMoves = getAllLastMoves();
 
-  allLastMoves.forEach(turn => {
+  allLastMoves.forEach((status) => {
+    status.turn = "B";
+    updatePlayerTurn(status.team, status);
+  });
 
-    turn.turn = 'B'
-    updatePlayerTurn(turn.team, turn)
-
-  })
-
-  playerData.forEach(player => {
-
-    let htmlForEmail =  `<h3>Time to choose your breakaway Rider</h3>
+  playerData.forEach((player) => {
+    let htmlForEmail = `<h3>Time to choose your breakaway Rider</h3>
     
-    <a href="${gameApiLink}?color=${player.team}">Click here to begin</a>`
+    <a href="${gameApiLink}?color=${player.team}">Click here to begin</a>`;
 
     MailApp.sendEmail(
       player.email,
       `${player.team} Team - Choose Your Breakaway Rider`,
-      '',
+      "",
       {
-        htmlBody: htmlForEmail
+        htmlBody: htmlForEmail,
       }
-    )
-
-  })
+    );
+  });
 }
 
+/**
+ * determins where they are in the breakaway process and returns appropriate
+ * results based on status
+ * @param {string} team - enter team to check on
+ * @returns {object} - hand or choices depending on status
+ */
+function breakawayLoop(team = "Black") {
+  let status = getLastMove(team);
 
-function breakawayLoop(team = 'Pink'){
-
-  let status = findLastMove(team);
-
-  // check if first choice complete 
-  if (status.phase[0] == 'first round complete'){
-
+  // check if first choice complete
+  if (status.phase[0] == "first round complete") {
     // check if hand already choosen
-    if (status.choice.length == 1 && JSON.stringify(status.hand) !== '{}'){
-      return { 
-            type: 'deckReturn', 
-            hand: status.hand, 
-            rider: status.hand.rider
-          }
+    if (status.choice.length == 1 && JSON.stringify(status.hand) !== "{}") {
+      return {
+        type: "deckReturn",
+        hand: status.hand,
+        rider: status.hand.rider,
+      };
     }
 
     // check if breakaway rider needs a hand to pick from
-    if (status.choice.length == 1 && JSON.stringify(status.hand) === '{}'){
+    if (status.choice.length == 1 && JSON.stringify(status.hand) === "{}") {
+      let breakawayRider = status.choice[0].rider;
 
-      let breakawayRider = status.choice[0].rider
+      let inPlayHand = returnHand(status.team, breakawayRider);
 
-      let inPlayHand = returnHand(status.team, breakawayRider)
-
-      console.log(inPlayHand.hand)
+      console.log(inPlayHand.hand);
 
       return {
-              type: 'deckReturn',
-              hand: {
-                      hand: inPlayHand.hand,
-                      rider: inPlayHand.rider
-                    },
-              rider: inPlayHand.rider
-          }
-
+        type: "deckReturn",
+        hand: {
+          hand: inPlayHand.hand,
+          rider: inPlayHand.rider,
+        },
+        rider: inPlayHand.rider,
+      };
     }
   }
 
   // if rider has been choose and screen refreshed return previously selected hand
-  if (JSON.stringify(status.hand) !== '{}'){
-    return { 
-            type: 'deckReturn', 
-            hand: status.hand, 
-            rider: status.hand.rider
-          }
+  if (JSON.stringify(status.hand) !== "{}") {
+    return {
+      type: "deckReturn",
+      hand: status.hand,
+      rider: status.hand.rider,
+    };
   }
 
   // check if rider hasn't choosen a rider yet
-  if (status.choice.length == 0 && JSON.stringify(status.hand) === '{}'){
-    return { type: "chooseDeck"};
+  if (status.choice.length == 0 && JSON.stringify(status.hand) === "{}") {
+    return { type: "chooseDeck" };
   }
-
-  
 }
 
-function returnBreakawayHand(color = 'Pink', rider = 'Roller') {
-  let status = findLastMove(color)
+/**
+ * returns hand back to webpage with card choices
+ * @param {string} team - team to use
+ * @param {string} rider - particular rider to get cards for
+ * @returns {object} hand - specific hand of cards from DB
+ */
+function returnBreakawayHand(team = "Black", rider = "Roller") {
+  let status = getLastMove(team);
 
-  let energyDeck, hand, deckIndex 
+  // find deck for rider and assign energydeck from that rider's deck
+  let di = status.deck.findIndex((x) => x.name == rider);
+  let energyDeck = status.deck[di].energyDeck;
 
-  status['deck'].forEach((deck, i) =>{
-    if (deck.name == rider){
-      energyDeck = deck.energyDeck
-      deckIndex = i
-    }
-  })
+  // grab four cards
+  let hand = { rider: rider, hand: energyDeck.splice(0, 4).sort() };
 
-  // grab four cards 
-  hand = {rider: rider, hand: energyDeck.splice(0,4).sort()}
-  
-  console.log("hand", hand)
-  console.log('energyDeck', energyDeck)
+  // console.log("hand", hand);
+  // console.log("energyDeck", energyDeck);
 
   // update hand and energy deck
-  status.hand = hand
-  status.deck[deckIndex].energyDeck = energyDeck
-    
+  status.hand = hand;
+  status.deck[di].energyDeck = energyDeck;
 
   // return hand to page
-  updatePlayerTurn(color, status)
+  updatePlayerTurn(team, status);
 
-  return hand // {rider: rider, hand: hand}
+  return hand; // {rider: rider, hand: hand}
 }
 
-function sendBreakawayCardChoice(card = '5R', teamColor="White", rider='Roller'){
-
-  let deckNumber, nextRider
-
-  let data = findLastMove(teamColor)
+/**
+ * add chosen card to choice and then begins check for end of breakaway
+ * @param {string} card - specific card
+ * @param {string} team - team to modify
+ * @param {string} rider - specific rider
+ * @returns message to webpage
+ */
+function sendBreakawayCardChoice(card, team, rider) {
+  let status = getLastMove(team);
   // console.log(data)
 
   // move card to choice and rest of hand to recycle
-  let cardIndex = data.hand.hand.indexOf(card)
-  data.hand.hand.splice(cardIndex,1)
+  let cardIndex = status.hand.hand.indexOf(card);
+  status.hand.hand.splice(cardIndex, 1);
 
-  if (data.choice){
-    data.choice.push({rider: rider, card: card})
+  if (status.choice) {
+    status.choice.push({ rider: rider, card: card });
   } else {
-    data.choice = [{rider: rider, card: card}]
+    status.choice = [{ rider: rider, card: card }];
   }
 
-  deckNumber = data.deck.findIndex(x => x.name == rider)
+  let deckNumber = status.deck.findIndex((x) => x.name == rider);
 
-  data.deck[deckNumber].recycle = [ ...data.deck[deckNumber].recycle, ...data.hand.hand]
-  data.hand = {}
+  status.deck[deckNumber].recycle = [
+    ...status.deck[deckNumber].recycle,
+    ...status.hand.hand,
+  ];
+  status.hand = {};
 
-  updatePlayerTurn(teamColor,data)
+  updatePlayerTurn(team, status);
 
-  checkForBreakawayCompletion()
+  checkForBreakawayCompletion();
 
-  return 'this turn complete'
-
+  return "this turn complete";
 }
 
-function checkForBreakawayCompletion(){
+/**
+ * massive function to test end of breakaway and process it if necessary
+ * @returns various things based on conditions
+ */
+function checkForBreakawayCompletion() {
+  let allLastMoves = getAllLastMoves();
 
-  let allTurnData = getAllLastMoves()
+  let secondRound = false;
 
-  let secondRound = false
-
-  allTurnData.forEach(turn => {
-    if (turn.phase[0] == 'first round complete'){
-      secondRound = true
+  allLastMoves.forEach((status) => {
+    if (status.phase[0] == "first round complete") {
+      secondRound = true;
     }
-  })
+  });
 
   if (secondRound) {
+    let secondRoundCheck = allLastMoves.filter((x) => x.choice.length !== 2);
 
-    let secondRoundCheck = allTurnData.filter(x => x.choice.length !== 2)
+    if (secondRoundCheck.length !== 0) {
+      console.log("still waiting for players");
 
-    if (secondRoundCheck.length !== 0){
+      return;
+    } else {
+      console.log("process second round");
 
-      console.log('still waiting for players')
-      
-      return 
+      let breakawayResults = [];
+      let breakawayResultsUnsorted = [];
 
-    } else {    
+      allLastMoves.forEach((line) => {
+        breakawayResultsUnsorted.push([
+          line.team,
+          line.choice[0].rider,
+          line.choice[0].card.charAt(0),
+          line.choice[1].card.charAt(0),
+          Number(line.choice[0].card.charAt(0)) +
+            Number(line.choice[1].card.charAt(0)),
+        ]);
+      });
 
-        console.log('process second round')
-      
-        let breakawayResults = []
-        let breakawayResultsUnsorted = []
+      let allPlayerData = getPlayerData();
+      let trackData = getTrackData();
 
-        allTurnData.forEach(line => {
+      // incase of tie arrange riders in order from back left to front right
+      let currentPositions = getCurrentPositions(
+        allPlayerData,
+        trackData,
+        "breakaway"
+      );
 
-          // TODO sort this array with winners at top
-          breakawayResultsUnsorted.push(
-                                [
-                                  line.team,
-                                  line.choice[0].rider,
-                                  line.choice[0].card.charAt(0),
-                                  line.choice[1].card.charAt(0),
-                                  Number(line.choice[0].card.charAt(0)) + Number(line.choice[1].card.charAt(0))
-                                ])
-        })
+      // create new array so when sorted by value back to front order is maintained
+      currentPositions.forEach((position) => {
+        let thisRider = breakawayResultsUnsorted.find(
+          (x) => x[0] + x[1] == position.rider
+        );
+        if (thisRider) {
+          breakawayResults.push(thisRider);
+        }
+      });
 
-        let allPlayerData = getPlayerData()
-        let trackData = getTrackData()
+      // arrange so top bids are first
+      breakawayResults.sort(
+        (firstItem, secondItem) => secondItem[4] - firstItem[4]
+      );
 
-        // incase of tie arrange riders in order from back left to front right 
-        let currentPositions = getCurrentPositions(allPlayerData, trackData, 'breakaway')
+      // get number of winning riders
+      let winningSpots = getBreakAwaySpots();
+      let winners = breakawayResults.slice(0, winningSpots);
+      let winnerList = [];
 
-        // create new array so when sorted by value back to front order is maintained
-        currentPositions.forEach(position => {
-          let thisRider = breakawayResultsUnsorted.find(x => x[0] + x[1] == position.rider)
-          if(thisRider){
-            breakawayResults.push(thisRider)
-          }
-          
-        })
+      winners.forEach((winner) => {
+        winnerList.push(winner[0] + winner[1]);
+      });
 
-        // arrange so top bids are first
-        breakawayResults.sort((firstItem, secondItem) => secondItem[4] - firstItem[4])
- 
-        // get number of winning riders
-        let winningSpots = getBreakAwaySpots()
-        let winners = breakawayResults.slice(0,winningSpots)
-        let winnerList = []
-        
-        winners.forEach(winner => {
-          winnerList.push(winner[0] + winner[1])
-        })
+      winners.forEach((winner, i) => {
+        // update rider deck
+        processBreakAwayWinnerCards(winner[0], winner[1]);
 
-        winners.forEach((winner, i) => {
-          
-          // TODO update rider deck
-          processBreakAwayWinnerCards(winner[0], winner[1])
+        // move rider
+        moveWinningBreakawayRider(winner[0] + winner[1], i + 1, trackData);
+      });
 
-          // TODO move rider
-          moveWinningBreakawayRider(winner[0]+winner[1], i + 1, trackData)
+      // put cards back in, combine, and shufffle decks
+      resetDecksAfterBreakaway();
 
-        })
-        
-        // put cards back in, combine, and shufffle decks
-        resetDecksAfterBreakaway()
+      allLastMoves.forEach((turn) => {
+        let thisPlayer = allPlayerData.find((x) => x.team == turn.team);
 
-        allTurnData.forEach(turn => {
+        // notify players
+        let emailTitle = `${turn.team} - Second Round Breakaway Bid Results`;
 
-          let thisPlayer = allPlayerData.find(x => x.team == turn.team)
+        let htmlTemplate = HtmlService.createTemplateFromFile(
+          "breakaway/breakawayEmail"
+        );
 
-          // notify players
-          let emailTitle = `${turn.team} - Second Round Breakaway Bid Results`
-      
-          let htmlTemplate = HtmlService.createTemplateFromFile('breakawayEmail')
+        htmlTemplate.player = turn;
+        htmlTemplate.turnReport = breakawayResults;
+        htmlTemplate.gameApiLink = gameApiLink;
+        htmlTemplate.message = "Breakaway Bidding Has Finished";
+        htmlTemplate.isFirstRound = false;
+        htmlTemplate.winnerList = winnerList;
 
-          htmlTemplate.player = turn
-          htmlTemplate.turnReport = breakawayResults
-          htmlTemplate.gameApiLink = gameApiLink
-          htmlTemplate.message = 'Breakaway Bidding Has Finished'
-          htmlTemplate.isFirstRound = false
-          htmlTemplate.winnerList = winnerList
+        let htmlForEmail = htmlTemplate.evaluate().getContent();
 
-          let htmlForEmail = htmlTemplate.evaluate().getContent()
+        MailApp.sendEmail(thisPlayer.email, emailTitle, "", {
+          htmlBody: htmlForEmail,
+        });
+      });
 
+      setBreakawayCounterToZero();
+      removeStartNumbers();
 
-          MailApp.sendEmail(
-            thisPlayer.email,
-            emailTitle,
-            '',
-            {
-              htmlBody: htmlForEmail
-            }
-          )
-      })
-
-    setBreakawayCounterToZero()
-    removeStartNumbers()
-
-    return
-  
-    } 
-
-    
+      return;
+    }
   }
 
+  let firstRoundCheck = allLastMoves.filter((x) => x.choice.length !== 1);
 
-
-  let firstRoundCheck = allTurnData.filter(x => x.choice.length !== 1)
-
-  if (firstRoundCheck.length !== 0){
-
-    console.log('still waiting for players')
-    return 
-
+  if (firstRoundCheck.length !== 0) {
+    console.log("still waiting for players");
+    return;
   } else {
+    let breakawayResults = [];
 
-    let breakawayResults = []
+    allLastMoves.forEach((line) => {
+      breakawayResults.push([
+        line.team,
+        line.choice[0].rider,
+        line.choice[0].card.charAt(0),
+      ]);
+    });
 
-    allTurnData.forEach(line => {
+    let allPlayerData = getPlayerData();
 
-      breakawayResults.push(
-                            [
-                              line.team,
-                              line.choice[0].rider,
-                              line.choice[0].card.charAt(0)
-                            ])
-    })
+    allLastMoves.forEach((turn) => {
+      turn.phase.push("first round complete");
+      updatePlayerTurn(turn.team, turn);
 
-    let allPlayerData = getPlayerData()
-
-    allTurnData.forEach(turn => {
-
-      turn.phase.push('first round complete')
-      updatePlayerTurn(turn.team, turn)
-
-      let thisPlayer = allPlayerData.find(x => x.team == turn.team)
+      let thisPlayer = allPlayerData.find((x) => x.team == turn.team);
 
       // notify players
-      let emailTitle = `${turn.team} - First Round Breakaway Bid Results`
-  
-      let htmlTemplate = HtmlService.createTemplateFromFile('breakawayEmail')
+      let emailTitle = `${turn.team} - First Round Breakaway Bid Results`;
 
-      htmlTemplate.player = turn
-      htmlTemplate.turnReport = breakawayResults
-      htmlTemplate.gameApiLink = gameApiLink
-      htmlTemplate.message = 'Choose Your Second Breakaway Bid'
-      htmlTemplate.isFirstRound = true
-      htmlTemplate.winnerList = []
+      let htmlTemplate = HtmlService.createTemplateFromFile(
+        "breakaway/breakawayEmail"
+      );
 
-      let htmlForEmail = htmlTemplate.evaluate().getContent()
+      htmlTemplate.player = turn;
+      htmlTemplate.turnReport = breakawayResults;
+      htmlTemplate.gameApiLink = gameApiLink;
+      htmlTemplate.message = "Choose Your Second Breakaway Bid";
+      htmlTemplate.isFirstRound = true;
+      htmlTemplate.winnerList = [];
 
+      let htmlForEmail = htmlTemplate.evaluate().getContent();
 
-      MailApp.sendEmail(
-        thisPlayer.email,
-        emailTitle,
-        '',
-        {
-          htmlBody: htmlForEmail
-        }
-      )
-  })
-
-
+      MailApp.sendEmail(thisPlayer.email, emailTitle, "", {
+        htmlBody: htmlForEmail,
+      });
+    });
   }
 }
-
-
-
-
-
-
-
-
-
-

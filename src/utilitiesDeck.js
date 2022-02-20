@@ -1,123 +1,105 @@
-function returnHand(color = 'Pink', rider = 'Roller') {
-  let status = findLastMove(color)
+function returnHand(team = "Black", rider = "Roller") {
+  let status = getLastMove(team);
 
-  let energyDeck, hand, deckIndex 
+  let hand;
 
-  status['deck'].forEach((deck, i) =>{
-    if (deck.name == rider){
-      energyDeck = deck.energyDeck
-      deckIndex = i
-    }
-  })
+  // find deck for rider and assign energydeck from that rider's deck
+  let di = status.deck.findIndex((x) => x.name == rider);
+  let energyDeck = status.deck[di].energyDeck;
+
+  // remove if code still works
+  // status["deck"].forEach((deck, i) => {
+  //   if (deck.name == rider) {
+  //     energyDeck = deck.energyDeck;
+  //     di = i;
+  //   }
+  // });
 
   // grab four cards if there are four cards
-  if(energyDeck.length >= 4){
-    hand = {rider: rider, hand: energyDeck.splice(0,4).sort()}
-  } else if (energyDeck.length == 0 && status.deck[deckIndex].recycle.length == 0){
-    hand = {rider: rider, hand: ['2E']}
-  } else if (status.deck[deckIndex].recycle.length == 0 && energyDeck.length > 0){
-    hand = {rider: rider, hand: [...energyDeck].sort()}
-    energyDeck = []
-  }  else {
-
+  if (energyDeck.length >= 4) {
+    hand = { rider: rider, hand: energyDeck.splice(0, 4).sort() };
+  } else if (energyDeck.length == 0 && status.deck[di].recycle.length == 0) {
+    hand = { rider: rider, hand: ["2E"] };
+  } else if (status.deck[di].recycle.length == 0 && energyDeck.length > 0) {
+    hand = { rider: rider, hand: [...energyDeck].sort() };
+    energyDeck = [];
+  } else {
     // grab what is in the energy deck
-    let currentHandLength = energyDeck.length
-    let currentHand = energyDeck.splice(0,currentHandLength)
-   
+    let currentHandLength = energyDeck.length;
+    let currentHand = energyDeck.splice(0, currentHandLength);
+
     // shuffle and move recycle to energy
-    energyDeck = shuffleDeck(status.deck[deckIndex].recycle)
-    status.deck[deckIndex].recycle = []
+    energyDeck = shuffleDeck(status.deck[di].recycle);
+    status.deck[di].recycle = [];
 
     // add remaining of 4 cards to hand
-    let remainingCurrentHand = energyDeck.splice(0,4-currentHandLength)
+    let remainingCurrentHand = energyDeck.splice(0, 4 - currentHandLength);
 
-    hand = {rider: rider, hand: [...currentHand, ...remainingCurrentHand].sort()}
+    hand = {
+      rider: rider,
+      hand: [...currentHand, ...remainingCurrentHand].sort(),
+    };
   }
 
-
-  console.log("hand", hand)
-  console.log('energyDeck', energyDeck)
+  // console.log("hand", hand);
+  // console.log("energyDeck", energyDeck);
 
   // update hand and energy deck
-  status.hand = hand
-  status.deck[deckIndex].energyDeck = energyDeck
-    
+  status.hand = hand;
+  status.deck[di].energyDeck = energyDeck;
 
   // return hand to page
-  updatePlayerTurn(color, status)
+  updatePlayerTurn(team, status);
 
-  return hand // {rider: rider, hand: hand}
+  return hand; // {rider: rider, hand: hand}
 }
 
-
-
-function resetForNewTurn(teamColor='Blue'){
-
-  let currentData = findLastMove(teamColor)
+function resetForNewTurn(team = "Black") {
+  let status = getLastMove(team);
 
   // add choices cards to discard piles
-  currentData.choice.forEach(choice => {
-
-    currentData.deck.forEach(deck => {
-      if (choice.rider == deck.name){
-        deck.discard.push(choice.card)
+  status.choice.forEach((choice) => {
+    status.deck.forEach((deck) => {
+      if (choice.rider == deck.name) {
+        deck.discard.push(choice.card);
       }
-    })
-  })
+    });
+  });
 
   // clear choice
-  currentData.choice = []
+  status.choice = [];
 
   // console.log(currentData.deck[0])
-  updatePlayerTurn(teamColor, currentData)
+  updatePlayerTurn(team, status);
 }
 
-
-function getDecksforDisplay(teamColor="Blue"){
-
-  let currentTurnData = findLastMove(teamColor)
+function getDecksforDisplay(team = "Black") {
+  let status = getLastMove(team);
 
   let deckDisplay = {
-    decks: currentTurnData.deck,
-    choice: currentTurnData.choice
-  }
+    decks: status.deck,
+    choice: status.choice,
+  };
   // let decks = currentTurnData.deck
 
-  deckDisplay.decks[0].energyDeck.sort()
-  deckDisplay.decks[0].recycle.sort()
-  deckDisplay.decks[0].discard.sort()
-  deckDisplay.decks[1].energyDeck.sort()
-  deckDisplay.decks[1].recycle.sort()
-  deckDisplay.decks[1].discard.sort()
+  deckDisplay.decks[0].energyDeck.sort();
+  deckDisplay.decks[0].recycle.sort();
+  deckDisplay.decks[0].discard.sort();
+  deckDisplay.decks[1].energyDeck.sort();
+  deckDisplay.decks[1].recycle.sort();
+  deckDisplay.decks[1].discard.sort();
 
-  console.log(deckDisplay.decks)
+  // console.log(deckDisplay.decks);
 
   // return decks
-  return deckDisplay
-
+  return deckDisplay;
 }
 
-
-
-
-
-	// { team: 'Green',
-  // turn: 0,
-  // phase: 0,
-  // hand: '',
-  // choice: '',
-  // deck: 
-  //  [ { name: 'Roller', energyDeck: [Object], hand: [], discard: [] },
-  //    { name: 'Sprinter', energyDeck: [Object], hand: [], discard: [] } ] }
-
-
-
-
-
-
-
-
-
-
-
-
+// { team: 'Green',
+// turn: 0,
+// phase: 0,
+// hand: '',
+// choice: '',
+// deck:
+//  [ { name: 'Roller', energyDeck: [Object], hand: [], discard: [] },
+//    { name: 'Sprinter', energyDeck: [Object], hand: [], discard: [] } ] }

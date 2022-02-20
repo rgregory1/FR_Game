@@ -1,31 +1,23 @@
 function doGet(e) {
   console.log("color: ", e.parameter.color);
 
-  let color = e.parameter.color
+  let color = e.parameter.color;
 
-  let lastMove = findLastMove(color)
+  let lastMove = getLastMove(color);
 
-  if (lastMove.turn == -1){
-
+  if (lastMove.turn == -1) {
     return loadStartPage(color);
-
-  } else if (lastMove.turn == 'B'){
-
-    return loadBreakawayPage(color)
-  
+  } else if (lastMove.turn == "B") {
+    return loadBreakawayPage(color);
   } else {
-  
     return loadGamePage(color);
-  
   }
-  
 }
 
+function loadStartPage(color) {
+  let page = HtmlService.createTemplateFromFile("setup/startPage");
 
-function loadStartPage(color){
-  let page = HtmlService.createTemplateFromFile("startPage");
-
-  let gameName = getGameName()
+  let gameName = getGameName();
 
   page.color = color;
 
@@ -37,13 +29,13 @@ function loadStartPage(color){
   return finalPage;
 }
 
-function loadBreakawayPage(color){
-  let page = HtmlService.createTemplateFromFile("breakawayPage");
+function loadBreakawayPage(color) {
+  let page = HtmlService.createTemplateFromFile("breakaway/breakawayPage");
 
-  let gameName = getGameName()
-  
+  let gameName = getGameName();
+
   page.color = color;
-  
+
   let finalPage = page
     .evaluate()
     .addMetaTag("viewport", "width=device-width, initial-scale=1")
@@ -52,13 +44,13 @@ function loadBreakawayPage(color){
   return finalPage;
 }
 
-function loadGamePage(color){
+function loadGamePage(color) {
   let page = HtmlService.createTemplateFromFile("gamePage");
 
-  let gameName = getGameName()
-  
+  let gameName = getGameName();
+
   page.color = color;
-  
+
   let finalPage = page
     .evaluate()
     .addMetaTag("viewport", "width=device-width, initial-scale=1")
