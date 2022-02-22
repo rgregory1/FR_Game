@@ -13,21 +13,21 @@
       crossorigin="anonymous"
     />
     <style>
-      div#render-track{
+      div#render-track {
         overflow: auto;
         padding: 30px;
-        background: #064CDB;
+        background: #064cdb;
       }
       table#trackTable {
         table-layout: fixed;
         /* width: 2120px; */
       }
-      #trackTable td{
+      #trackTable td {
         overflow: hidden;
         height: 35px;
         width: 80px;
       }
-      .card_body{
+      .card_body {
         /* background: green; */
         width: 2.25em;
         height: 3.5em;
@@ -40,7 +40,7 @@
         float: left;
         margin: 20px;
       }
-      .played-card{
+      .played-card {
         background: #000;
         width: 2.25em;
         height: 3.5em;
@@ -53,7 +53,8 @@
         float: left;
         margin: 20px;
       }
-      #displayData, .card_options_div {
+      #displayData,
+      .card_options_div {
         clear: both;
       }
       .Green {
@@ -135,7 +136,7 @@
         border-top: 1px solid black;
         padding-top: 20px;
       }
-      #deck-display h4.played-card-title{
+      #deck-display h4.played-card-title {
         border: 0;
         padding: 0;
       }
@@ -147,9 +148,9 @@
         border-left: 5px solid green !important;
       } */
       .rider-played {
-        border-radius:50%;
+        border-radius: 50%;
         width: 20px;
-        height:20px;
+        height: 20px;
         float: left;
         margin-right: 10px;
       }
@@ -160,27 +161,25 @@
     <title>Hello, world!</title>
   </head>
   <body>
-   
-        
-    <?!= include("renderTrack"); ?>    
-    
+    <?!= include("renderTrack"); ?>
+
     <div class="container mt-3">
       <div class="row">
         <div class="col-sm-8">
           <h1>
             <span id="team"><?= color ?></span> Turn
           </h1>
-      
+
           <div id="displayData"></div>
         </div>
         <div class="col-sm-4">
           <div id="played-list"></div>
-          <div id="deck-display">
-            
-          </div>
+          <div id="deck-display"></div>
         </div>
-      </div> <!-- end row -->
-    </div> <!-- end container -->
+      </div>
+      <!-- end row -->
+    </div>
+    <!-- end container -->
 
     <template>
       <h2 class="mb-3 mt-3">Choose First Rider to Play</h2>
@@ -191,7 +190,11 @@
           </button>
         </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-primary mb-3" id="sprinterButton">
+          <button
+            type="submit"
+            class="btn btn-primary mb-3"
+            id="sprinterButton"
+          >
             Sprinter
           </button>
         </div>
@@ -199,17 +202,19 @@
     </template>
 
     <template>
-      
-        <h2 class="mb-3 mt-3">Choose <span id="rider_type"></span> Card</h2>
-        
-        <div class="card_options_div row">
-          <div class="col-6">
+      <h2 class="mb-3 mt-3">Choose <span id="rider_type"></span> Card</h2>
 
-            <div class="btn-group btn-group-lg" id="card_options" role="group" aria-label="Basic radio toggle button group" required>
-            </div>
+      <div class="card_options_div row">
+        <div class="col-lg-6">
+          <div
+            class="btn-group btn-group-lg"
+            id="card_options"
+            role="group"
+            aria-label="Basic radio toggle button group"
+            required
+          ></div>
 
-
-            <!-- <select
+          <!-- <select
               class="form-select mb-3"
               id="card_options"
               aria-label="card_options"
@@ -218,30 +223,31 @@
               
             </select> -->
 
-            <!-- <label for="card_options">Choose card</label> -->
-          </div>
-          <div class="col-6">
-            <button type="submit" class="btn btn-secondary mb-3 btn-lg" id="submitCard">
-              Submit Card
-            </button>
-          </div>
+          <!-- <label for="card_options">Choose card</label> -->
         </div>
-      
+        <div class="col-lg-6">
+          <button
+            type="submit"
+            class="btn btn-secondary mb-3 btn-lg"
+            id="submitCard"
+          >
+            Submit Card
+          </button>
+        </div>
+      </div>
+
       <div id="display_cards" class="mb-3 mt-3"></div>
-      
     </template>
 
     <template>
       <div class="alert alert-success">
-      <p>
-        Your choices have been recorded, please wait for your next email.
-      </p>
+        <p>Your choices have been recorded, please wait for your next email.</p>
       </div>
     </template>
     <script>
-      var team = document.getElementById("team").textContent;
-      document.addEventListener("DOMContentLoaded", afterPageLoaded);
-      
+      var team = document.getElementById("team").textContent
+      document.addEventListener("DOMContentLoaded", afterPageLoaded)
+
       // document.addEventListener("DOMContentLoaded", slide);
 
       // function slide(){
@@ -249,117 +255,129 @@
       //  }
 
       function afterPageLoaded() {
-        var team = document.getElementById("team").textContent;
-        console.log("inside game loop");
-        console.log("team: ", team);
+        var team = document.getElementById("team").textContent
+        console.log("inside game loop")
+        console.log("team: ", team)
 
         // determing what to show as far as cards to pick
-        google.script.run.withSuccessHandler(displayOptions).gameLoop(team);
+        google.script.run.withSuccessHandler(displayOptions).gameLoop(team)
 
         // show available energy, discard, and recycle on right side
-        google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
-
-        
+        google.script.run
+          .withSuccessHandler(renderDecks)
+          .getDecksforDisplay(team)
       }
 
       function displayOptions(options) {
-
-        console.log('options')
+        console.log("options")
         console.log(options)
 
-        var displayP = document.getElementById("displayData");
+        var displayP = document.getElementById("displayData")
         while (displayP.hasChildNodes()) {
-          displayP.removeChild(displayP.firstChild);
+          displayP.removeChild(displayP.firstChild)
         }
 
         // test if game over
-        if(options.type == 'gameOver'){
-          var h2 = document.createElement('H2')
-          h2.classList.add('alert', 'alert-danger','mt-5', 'w-50', 'p-3')
-          h2.innerHTML = 'Game Over'
+        if (options.type == "gameOver") {
+          var h2 = document.createElement("H2")
+          h2.classList.add("alert", "alert-danger", "mt-5", "w-50", "p-3")
+          h2.innerHTML = "Game Over"
           displayP.appendChild(h2)
-        } 
+        }
 
         // test if turn played
-        if(options.type == 'finishedPlaying'){
+        if (options.type == "finishedPlaying") {
           var gameTurn = options.gameTurn
-          var h2 = document.createElement('H2')
-          h2.classList.add('alert', 'alert-secondary','mt-5', 'w-50', 'p-3')
-          h2.innerHTML = 'You are finished - Turn ' + gameTurn 
+          var h2 = document.createElement("H2")
+          h2.classList.add("alert", "alert-secondary", "mt-5", "w-50", "p-3")
+          h2.innerHTML = "You are finished - Turn " + gameTurn
           displayP.appendChild(h2)
-        } 
+        }
 
         // test if turn played
-        if(options.type == 'turnPlayed'){
+        if (options.type == "turnPlayed") {
           var gameTurn = options.gameTurn
-          var h2 = document.createElement('H2')
-          h2.classList.add('alert', 'alert-secondary','mt-5', 'w-50', 'p-3')
-          h2.innerHTML = 'Turn ' + gameTurn + ' Played'
+          var h2 = document.createElement("H2")
+          h2.classList.add("alert", "alert-secondary", "mt-5", "w-50", "p-3")
+          h2.innerHTML = "Turn " + gameTurn + " Played"
           displayP.appendChild(h2)
-        } 
-        
+        }
+
+        // test if setup Complete
+        if (options.type == "setupComplete") {
+          var gameTurn = options.gameTurn
+          var para = document.createElement("P")
+          para.classList.add("alert", "alert-secondary", "mt-5", "w-50", "p-3")
+          para.innerHTML =
+            "Your initial setup is complete, you will be notified when play begins"
+          displayP.appendChild(para)
+        }
+
         if (options.type == "chooseDeck") {
           // get and display starting positions template
-          var temp = document.getElementsByTagName("template")[0];
-          var riderChoiceHTML = temp.content.cloneNode(true);
-          displayP.appendChild(riderChoiceHTML);
+          var temp = document.getElementsByTagName("template")[0]
+          var riderChoiceHTML = temp.content.cloneNode(true)
+          displayP.appendChild(riderChoiceHTML)
 
           document
             .getElementById("rollerButton")
-            .addEventListener("click", handleRollerSubmit);
+            .addEventListener("click", handleRollerSubmit)
           document
             .getElementById("sprinterButton")
-            .addEventListener("click", handleSprinterSubmit);
-        } 
-        
+            .addEventListener("click", handleSprinterSubmit)
+        }
+
         // else {
         //   var message = "something not working";
         //   displayP.appendChild(document.createTextNode(message));
         // }
 
-        if (options.type == 'deckReturn'){
-          let handParameters = {rider: options.rider, hand: options.hand.hand}
+        if (options.type == "deckReturn") {
+          let handParameters = {
+            rider: options.rider,
+            hand: options.hand.hand,
+          }
           displayCardOptions(handParameters)
         }
       }
 
       function handleRollerSubmit() {
-          
-          google.script.run.withSuccessHandler(displayCardOptions).returnHand(team, 'Roller')
-          return;
-        }
-      
-        function handleSprinterSubmit() {
+        google.script.run
+          .withSuccessHandler(displayCardOptions)
+          .returnHand(team, "Roller")
+        return
+      }
 
-          google.script.run.withSuccessHandler(displayCardOptions).returnHand(team, 'Sprinter')
-          return;
-        }
+      function handleSprinterSubmit() {
+        google.script.run
+          .withSuccessHandler(displayCardOptions)
+          .returnHand(team, "Sprinter")
+        return
+      }
 
-      function alertMessage(){
-        alert('alert message here')
+      function alertMessage() {
+        alert("alert message here")
       }
 
       function displayCardOptions(parameter) {
-        
         console.log(parameter)
 
-        if(parameter == 'this turn complete'){
+        if (parameter == "this turn complete") {
           displaySuccessMessage()
           return
         }
 
         // parameter = {rider: 'Sprinter', hand: [x,x,x,x]}
 
-        var displayP = document.getElementById("displayData");
+        var displayP = document.getElementById("displayData")
         while (displayP.hasChildNodes()) {
-          displayP.removeChild(displayP.firstChild);
+          displayP.removeChild(displayP.firstChild)
         }
-        
 
         // get and display starting positions template
-        var temp = document.getElementsByTagName("template")[1];
-        var startingPosHTML = temp.content.cloneNode(true);
-        displayP.appendChild(startingPosHTML);
+        var temp = document.getElementsByTagName("template")[1]
+        var startingPosHTML = temp.content.cloneNode(true)
+        displayP.appendChild(startingPosHTML)
 
         var displayCards = document.getElementById("display_cards")
 
@@ -368,98 +386,98 @@
         riderType.textContent = parameter.rider
 
         // populate with open positions
-        var cardOptions = document.getElementById("card_options");
-        
+        var cardOptions = document.getElementById("card_options")
 
         parameter.hand.forEach((card, i) => {
-          var radioButton = document.createElement('input')
-          radioButton.type = 'radio'
+          var radioButton = document.createElement("input")
+          radioButton.type = "radio"
           radioButton.value = card
-          radioButton.name = 'card-picker'
-          radioButton.id = 'card-' + i
+          radioButton.name = "card-picker"
+          radioButton.id = "card-" + i
           radioButton.setAttribute("class", "btn-check")
           radioButton.setAttribute("autocomplete", "off")
 
-          var radioLabel = document.createElement('label')
-          radioLabel.htmlFor = 'card-' + i
-          var description = document.createTextNode(card);
-          radioLabel.appendChild(description);
+          var radioLabel = document.createElement("label")
+          radioLabel.htmlFor = "card-" + i
+          var description = document.createTextNode(card)
+          radioLabel.appendChild(description)
           radioLabel.setAttribute("class", "btn btn-outline-secondary")
 
-          cardOptions.appendChild(radioButton);
-          cardOptions.appendChild(radioLabel);
+          cardOptions.appendChild(radioButton)
+          cardOptions.appendChild(radioLabel)
           // var option = document.createElement("option");
           // option.textContent = card;
           // cardOptions.appendChild(option);
-        });
-        
-        parameter.hand.forEach((card) => {
+        })
+
+        parameter.hand.forEach(card => {
           var newDiv = document.createElement("div")
           newDiv.setAttribute("class", "card_body " + team)
           newDiv.innerHTML = card
           displayCards.appendChild(newDiv)
-
         })
 
         document
           .getElementById("submitCard")
-          .addEventListener("click", handleSubmitCard);
+          .addEventListener("click", handleSubmitCard)
 
-        google.script.run.withSuccessHandler(renderDecks).getDecksforDisplay(team)
-        
+        google.script.run
+          .withSuccessHandler(renderDecks)
+          .getDecksforDisplay(team)
       }
 
       function handleSubmitCard() {
         // var cardChoice = document.getElementById("card_options");
-        var cardChoice = document.querySelector('input[name="card-picker"]:checked')
-        var teamColor = document.getElementById("team").textContent;
+        var cardChoice = document.querySelector(
+          'input[name="card-picker"]:checked'
+        )
+        var teamColor = document.getElementById("team").textContent
         var riderType = document.getElementById("rider_type").textContent
 
         if (cardChoice.value == "") {
-          alert("nope");
+          alert("nope")
           // google.script.run.sameNumDialog()
-          return;
+          return
         }
-        
+
         // clear cards and drop down so mistakes don't enter the game
         var displayData = document.getElementById("displayData")
         while (displayData.hasChildNodes()) {
-          displayData.removeChild(displayData.firstChild);
+          displayData.removeChild(displayData.firstChild)
         }
-        
+
         console.log(cardChoice.value)
-        google.script.run.withSuccessHandler(displayCardOptions).sendCardChoice(cardChoice.value, teamColor, riderType);
-        
+        google.script.run
+          .withSuccessHandler(displayCardOptions)
+          .sendCardChoice(cardChoice.value, teamColor, riderType)
+
         // displaySuccessMessage()
       }
 
-      function renderDecks(deckObject){
-
+      function renderDecks(deckObject) {
         let decks = deckObject.decks
-        
+
         console.log(deckObject.choice.length)
-        var deckDisplay = document.getElementById('deck-display')
+        var deckDisplay = document.getElementById("deck-display")
 
         // remove past content
         while (deckDisplay.hasChildNodes()) {
-          deckDisplay.removeChild(deckDisplay.firstChild);
+          deckDisplay.removeChild(deckDisplay.firstChild)
         }
 
-        if(deckObject.choice.length > 0){
-
-          console.log('inside the choice loop')
-          var playedCardsDiv = document.createElement('div')
+        if (deckObject.choice.length > 0) {
+          console.log("inside the choice loop")
+          var playedCardsDiv = document.createElement("div")
           deckDisplay.appendChild(playedCardsDiv)
 
-          var playedCardsTitle = document.createElement('H4')
-          var playedCardsTitleText = document.createTextNode('Cards Played')
+          var playedCardsTitle = document.createElement("H4")
+          var playedCardsTitleText = document.createTextNode("Cards Played")
           playedCardsTitle.classList.add("played-card-title")
           playedCardsTitle.appendChild(playedCardsTitleText)
           playedCardsDiv.appendChild(playedCardsTitle)
 
           deckObject.choice.forEach(choice => {
-            
-            var playedCardBody = document.createElement('div')
+            var playedCardBody = document.createElement("div")
             playedCardBody.classList.add("played-card")
             var playedCardBodyText = document.createTextNode(choice.card)
             playedCardBody.appendChild(playedCardBodyText)
@@ -468,85 +486,79 @@
         }
 
         decks.forEach(deck => {
-
           console.log(deck.name)
-          var deckTitle = document.createElement('H4')
+          var deckTitle = document.createElement("H4")
           var deckTitleText = document.createTextNode(deck.name)
           deckTitle.appendChild(deckTitleText)
           deckDisplay.appendChild(deckTitle)
 
-          var deckDisplayDl = document.createElement('dl')
-          deckDisplayDl.classList.add('row')
+          var deckDisplayDl = document.createElement("dl")
+          deckDisplayDl.classList.add("row")
 
-          var energyDeckTitle = document.createElement('dt')
+          var energyDeckTitle = document.createElement("dt")
           energyDeckTitle.classList.add("col-sm-4")
-          var energyDeckTitleContent = document.createTextNode('Energy')
+          var energyDeckTitleContent = document.createTextNode("Energy")
           energyDeckTitle.appendChild(energyDeckTitleContent)
           deckDisplayDl.appendChild(energyDeckTitle)
 
-          var energyDeck = document.createElement('dd')
+          var energyDeck = document.createElement("dd")
           energyDeck.classList.add("col-sm-8")
           deck.energyDeck.forEach(card => {
-            var cardValue = document.createTextNode(card + ' ')
+            var cardValue = document.createTextNode(card + " ")
             energyDeck.appendChild(cardValue)
           })
           deckDisplayDl.appendChild(energyDeck)
 
-          var recycleDeckTitle = document.createElement('dt')
+          var recycleDeckTitle = document.createElement("dt")
           recycleDeckTitle.classList.add("col-sm-4")
-          var recycleDeckTitleContent = document.createTextNode('Recycle')
+          var recycleDeckTitleContent = document.createTextNode("Recycle")
           recycleDeckTitle.appendChild(recycleDeckTitleContent)
           deckDisplayDl.appendChild(recycleDeckTitle)
 
-          var recycleDeck = document.createElement('dd')
+          var recycleDeck = document.createElement("dd")
           recycleDeck.classList.add("col-sm-8")
           deck.recycle.forEach(card => {
-            var cardValue = document.createTextNode(card + ' ')
+            var cardValue = document.createTextNode(card + " ")
             recycleDeck.appendChild(cardValue)
           })
           deckDisplayDl.appendChild(recycleDeck)
 
-          var discardDeckTitle = document.createElement('dt')
+          var discardDeckTitle = document.createElement("dt")
           discardDeckTitle.classList.add("col-sm-4")
-          var discardDeckTitleContent = document.createTextNode('Discard')
+          var discardDeckTitleContent = document.createTextNode("Discard")
           discardDeckTitle.appendChild(discardDeckTitleContent)
           deckDisplayDl.appendChild(discardDeckTitle)
 
-          var discardDeck = document.createElement('dd')
+          var discardDeck = document.createElement("dd")
           discardDeck.classList.add("col-sm-8")
           deck.discard.forEach(card => {
-            var cardValue = document.createTextNode(card + ' ')
+            var cardValue = document.createTextNode(card + " ")
             discardDeck.appendChild(cardValue)
           })
           deckDisplayDl.appendChild(discardDeck)
-          
+
           deckDisplay.appendChild(deckDisplayDl)
         })
 
         // var message = "decks will appear here";
         // deckDisplay.appendChild(document.createTextNode(message));
-
       }
 
       function displaySuccessMessage() {
-        var displayP = document.getElementById("displayData");
+        var displayP = document.getElementById("displayData")
 
         // remove past content
         while (displayP.hasChildNodes()) {
-          displayP.removeChild(displayP.firstChild);
+          displayP.removeChild(displayP.firstChild)
         }
 
-        var temp = document.getElementsByTagName("template")[2];
-        var startingPosHTML = temp.content.cloneNode(true);
-        displayP.appendChild(startingPosHTML);
+        var temp = document.getElementsByTagName("template")[2]
+        var startingPosHTML = temp.content.cloneNode(true)
+        displayP.appendChild(startingPosHTML)
       }
-
-      
-
     </script>
 
     <?!= include("renderTrack-js"); ?>
-    
 
     <!-- <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -554,15 +566,19 @@
       crossorigin="anonymous"
     ></script> -->
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
 
     <script>
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      )
       var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
       })
-
     </script>
-    
   </body>
 </html>

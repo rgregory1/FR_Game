@@ -1,10 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Hello, world!</title>
     <style>
-
       h2.text-stuff {
         font-size: 30px;
       }
@@ -37,7 +36,7 @@
       a.button:visited {
         background-color: #ccc;
       }
-      
+
       table.GeneratedTable {
         /* width: 100%; */
         background-color: #ffffff;
@@ -48,7 +47,8 @@
         color: #000000;
       }
 
-      table.GeneratedTable td, table.GeneratedTable th {
+      table.GeneratedTable td,
+      table.GeneratedTable th {
         border-width: 2px;
         border-color: #ffcc00;
         border-style: solid;
@@ -58,22 +58,26 @@
       table.GeneratedTable thead {
         background-color: #ffcc00;
       }
-      
     </style>
   </head>
   <body>
-    <h2><?= player.team ?> Team - Choose your starting positions</h2>
+    <h2>
+      <?= player.team ?>
+      Team - Choose your starting positions
+    </h2>
 
-    
-    <p>Click below to choose.</p>
-    
     <p>
-    <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
-        Choose Now
-    </a>
+      Welcomd to the
+      <?= gameName ?>
+      game. Time to get started.
     </p>
 
-  
-   
+    <p>Click below to see the game map and choose you starting positions.</p>
+
+    <p>
+      <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
+        Choose Now
+      </a>
+    </p>
   </body>
 </html>

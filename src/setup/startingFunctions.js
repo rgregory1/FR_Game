@@ -4,29 +4,29 @@
  *  @returns {Array of Strings} - list of starting positions
  */
 function returnPossiblePositions() {
-  let rawStartPositions = track.getDataRange().getValues().flat();
+  let rawStartPositions = track.getDataRange().getValues().flat()
   // let rawStartPositions = track.getRange(2, 1, 2, 5).getValues().flat();
 
-  rawStartPositions = rawStartPositions.filter((x) => x.charAt(0) == "S");
+  rawStartPositions = rawStartPositions.filter(x => x.charAt(0) == "S")
 
-  let startPositions = [];
+  let startPositions = []
 
-  rawStartPositions.forEach((x) => {
-    let available = x.split("-");
-    startPositions.push(available[1]);
-  });
+  rawStartPositions.forEach(x => {
+    let available = x.split("-")
+    startPositions.push(available[1])
+  })
 
-  let validStarts = startPositions.filter((x) => !isNaN(x));
-  console.log(validStarts);
+  let validStarts = startPositions.filter(x => !isNaN(x))
+  console.log(validStarts)
 
   // reverse options so they come out in ascending order when pushed
   validStarts.sort(function (a, b) {
-    return b - a;
-  });
+    return b - a
+  })
 
-  console.log(validStarts);
+  console.log(validStarts)
 
-  return validStarts.reverse();
+  return validStarts.reverse()
 }
 
 /**
@@ -39,35 +39,35 @@ function sendStartingPos(
 ) {
   // TODO make this function more universal, remove sprinter and roller from funcion
 
-  let startPositions = track.getDataRange().getValues();
+  let startPositions = track.getDataRange().getValues()
 
   startPositions.forEach((line, index) => {
-    var spIndex = line.indexOf("S-" + parameter.sprinter);
+    var spIndex = line.indexOf("S-" + parameter.sprinter)
 
     if (spIndex !== -1) {
       track
         .getRange(index + 1, spIndex + 1)
-        .setValue("S-" + parameter.teamColor + "Sprinter");
+        .setValue("S-" + parameter.teamColor + "Sprinter")
     }
 
-    var roIndex = line.indexOf("S-" + parameter.roller);
+    var roIndex = line.indexOf("S-" + parameter.roller)
 
     if (roIndex !== -1) {
       track
         .getRange(index + 1, roIndex + 1)
-        .setValue("S-" + parameter.teamColor + "Roller");
+        .setValue("S-" + parameter.teamColor + "Roller")
     }
-  });
+  })
 
   // track.getRange(2, 1, 2, 5).setValues(startPositions);
-  SpreadsheetApp.flush();
+  SpreadsheetApp.flush()
 
   // increase turn count so they won't be choosing stating positions next time
-  incrementPlayerTurn(parameter.teamColor);
+  incrementPlayerTurn(parameter.teamColor)
 
-  emailNextTeam();
+  emailNextTeam()
 
-  return;
+  return
 }
 
 /**
@@ -76,55 +76,59 @@ function sendStartingPos(
  * if everyone has played it will start the breakaway or initiate the game
  */
 function emailNextTeam() {
-  let isBreakAway = getBreakAwayStatus();
+  let isBreakAway = getBreakAwayStatus()
 
-  let allPlayerData = getPlayerData();
+  let allPlayerData = getPlayerData()
 
   // TODO can this be replaced with one call for all teams?
   // add turn data to each player
-  allPlayerData.forEach((player) => {
-    let status = getLastMove(player.team);
-    player.turn = status.turn;
-  });
+  allPlayerData.forEach(player => {
+    let status = getLastMove(player.team)
+    player.turn = status.turn
+  })
 
   // filter out players who have already positioned for the start
-  let possiblePlayers = allPlayerData.filter((x) => x.turn == -1);
+  let possiblePlayers = allPlayerData.filter(x => x.turn == -1)
 
   if (possiblePlayers.length !== 0) {
     // randomize players
-    possiblePlayers = shuffleDeck(possiblePlayers);
+    possiblePlayers = shuffleDeck(possiblePlayers)
 
     // if tour points present, put them at the end in order of least to most
     possiblePlayers.sort(
       (firstItem, secondItem) => firstItem.tourPoints - secondItem.tourPoints
-    );
+    )
 
     // get random player
-    let nextPlayer = possiblePlayers[0];
-    console.log("emailing next player: ", nextPlayer.team);
+    let nextPlayer = possiblePlayers[0]
+    console.log("emailing next player: ", nextPlayer.team)
 
-    let htmlTemplate = HtmlService.createTemplateFromFile("playerEmail");
+    // TODO Spruce up the startingPosEmail page
+    let htmlTemplate = HtmlService.createTemplateFromFile(
+      "setup/startingPosEmail"
+    )
+    let gameName = getGameName()
+    htmlTemplate.player = nextPlayer
+    htmlTemplate.gameApiLink = gameApiLink
+    htmlTemplate.gameName = gameName
 
-    htmlTemplate.player = nextPlayer;
-    htmlTemplate.gameApiLink = gameApiLink;
-
-    let htmlForEmail = htmlTemplate.evaluate().getContent();
+    let htmlForEmail = htmlTemplate.evaluate().getContent()
 
     MailApp.sendEmail(
       nextPlayer.email,
-      `${nextPlayer.team} Team - Choose Starting Positions`,
+      `${gameName} ${nextPlayer.team} Team - Begin Game`,
       "",
       {
         htmlBody: htmlForEmail,
       }
-    );
+    )
   } else if (isBreakAway) {
-    console.log("It is break away time");
-    initiateBreakaway();
+    console.log("It is break away time")
+    initiateBreakaway()
   } else {
-    removeStartNumbers();
-    initiatFirstGameTurn();
-    console.log("begin the game");
+    removeStartNumbers()
+    initiateFirstGameTurn()
+    console.log("begin the game")
   }
 
   // let currentTeam = allPlayerData.findIndex(x => x.team == team)
@@ -135,10 +139,10 @@ function emailNextTeam() {
  * @param {string} team - team to increment
  */
 function incrementPlayerTurn(team = "Black") {
-  let status = getLastMove(team);
+  let status = getLastMove(team)
 
-  status.turn = status.turn + 1;
-  console.log(status);
+  status.turn = status.turn + 1
+  // console.log(status);
 
   db.appendRow([
     status.team,
@@ -148,5 +152,5 @@ function incrementPlayerTurn(team = "Black") {
     JSON.stringify(status.hand),
     JSON.stringify(status.choice),
     JSON.stringify(status.deck),
-  ]);
+  ])
 }

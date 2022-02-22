@@ -1,10 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Hello, world!</title>
     <style>
-
       h2.text-stuff {
         font-size: 30px;
       }
@@ -37,7 +36,7 @@
       a.button:visited {
         background-color: #ccc;
       }
-      
+
       table.GeneratedTable {
         /* width: 100%; */
         background-color: #ffffff;
@@ -48,7 +47,8 @@
         color: #000000;
       }
 
-      table.GeneratedTable td, table.GeneratedTable th {
+      table.GeneratedTable td,
+      table.GeneratedTable th {
         border-width: 2px;
         border-color: #ffcc00;
         border-style: solid;
@@ -58,96 +58,121 @@
       table.GeneratedTable thead {
         background-color: #ffcc00;
       }
-      
+
+      table.finish-table {
+        /* width: 100%; */
+        background-color: #ffffff;
+        border-collapse: collapse;
+        border-width: 2px;
+        border-color: #89cff0;
+        border-style: solid;
+        color: #000000;
+      }
+
+      table.finish-table td,
+      table.finish-table th {
+        border-width: 2px;
+        border-color: #89cff0;
+        border-style: solid;
+        padding: 3px;
+      }
+
+      table.finish-table thead {
+        background-color: #89cff0;
+      }
       table {
         margin-bottom: 30px;
       }
     </style>
   </head>
   <body>
-    <h2><?= player.team ?> Team Play Round <?= nextGameTurn ?></h2>
+    <h2>
+      <?= player.team ?>
+      Team Play Round
+      <?= nextGameTurn ?>
+    </h2>
 
     <p>Last turn summary:</p>
 
     <table class="GeneratedTable">
-        <thead>
-          <tr> 
-            <th style="width:150px">Rider</th>
-            <th style="width:75px">Card Played</th>
-            <th style="width:75px">Adjustment</th>
-            <th style="width:75px">Draft</th>
-            <th style="width:75px">Exhaustion</th>
-            <? if (addPlaces) { ?> 
-              <th style="width:75px">Place</th>
-            <? } ?>
-          </tr>
-        </thead>
-          <tbody>
-          <? turnReport.forEach(line => { ?>
-          <tr>
-            <td><?= line[0] ?></td>
-            <td style="text-align:center"><?= line[1] ?></td>
-            <td style="text-align:center"><?= line[2] ?></td>
-            <td style="text-align:center"><?= line[3] ?></td>
-            <td style="text-align:center"><?= line[4] ?></td>
-            <? if (addPlaces) { ?> 
-              <td style="text-align:center"><?= line[5] ?></td>
-            <? } ?>
-          </tr>
-          <? }) ?>
-        </tbody>
-      </table>
+      <thead>
+        <tr>
+          <th style="width: 150px">Rider</th>
+          <th style="width: 75px">Card Played</th>
+          <th style="width: 75px">Adjustment</th>
+          <th style="width: 75px">Draft</th>
+          <th style="width: 75px">Exhaustion</th>
+          <? if (addPlaces) { ?>
+          <th style="width: 75px">Place</th>
+          <? } ?>
+        </tr>
+      </thead>
+      <tbody>
+        <? turnReport.forEach(line =>
+        { ?>
+        <tr>
+          <td><?= line[0] ?></td>
+          <td style="text-align: center"><?= line[1] ?></td>
+          <td style="text-align: center"><?= line[2] ?></td>
+          <td style="text-align: center"><?= line[3] ?></td>
+          <td style="text-align: center"><?= line[4] ?></td>
+          <? if (addPlaces) { ?>
+          <td style="text-align: center"><?= line[5] ?></td>
+          <? } ?>
+        </tr>
+        <? }) ?>
+      </tbody>
+    </table>
 
     <? if (isGameOver) { ?>
 
-      <p>Click below to see final postions.</p>
-    
-      <p>
+    <p>Click below to see final postions.</p>
+
+    <p>
       <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
-          See positions
+        See positions
       </a>
-      </p>
+    </p>
 
     <? } else { ?>
 
-        <p>Click below to play your cards.</p>
-    
-        <p>
-        <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
-            Play Now
-        </a>
-        </p>
+    <p>Click below to play your cards.</p>
+
+    <p>
+      <a class="button" href="<?= gameApiLink ?>?color=<?= player.team ?>">
+        Play Now
+      </a>
+    </p>
 
     <? } ?>
 
-     <? if (finishData.length > 0) { ?>
+    <? if (finishData.length >
+    0) { ?>
 
-    <h2 class="mt-5">Current Finishers</h2> 
-    <table class="GeneratedTable">
-        <thead>
-          <tr> 
-            <th style="width:75px">Place</th>
-            <th style="width:125px">Rider</th>
-            <th style="width:75px">Turn</th>
-            <th style="width:75px">Past Finish</th>
-            <th style="width:75px">Exhaustion</th>
-          </tr>
-        </thead>
-          <tbody>
-          <? finishData.forEach(line => { ?>
-          <tr>
-            <td><?= line[0] ?></td>
-            <td style="text-align:center"><?= line[1] ?></td>
-            <td style="text-align:center"><?= line[3] ?></td>
-            <td style="text-align:center"><?= line[2] ?></td>
-            <td style="text-align:center"><?= line[4] ?></td>
-          </tr>
-          <? }) ?>
-        </tbody>
-      </table>
+    <h2 class="mt-5">Current Finishers</h2>
+    <table class="finish-table">
+      <thead>
+        <tr>
+          <th style="width: 75px">Place</th>
+          <th style="width: 125px">Rider</th>
+          <th style="width: 75px">Turn</th>
+          <th style="width: 75px">Past Finish</th>
+          <th style="width: 75px">Exhaustion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <? finishData.forEach(line =>
+        { ?>
+        <tr>
+          <td><?= line[0] ?></td>
+          <td style="text-align: center"><?= line[1] ?></td>
+          <td style="text-align: center"><?= line[3] ?></td>
+          <td style="text-align: center"><?= line[2] ?></td>
+          <td style="text-align: center"><?= line[4] ?></td>
+        </tr>
+        <? }) ?>
+      </tbody>
+    </table>
     <? } ?>
-
-  
-   
   </body>
 </html>

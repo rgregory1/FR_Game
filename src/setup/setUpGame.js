@@ -53,7 +53,7 @@ function buildDecks(d1ex, d2ex) {
     decks.push(deck);
   });
 
-  console.log(decks[0], decks[1]);
+  // console.log(decks[0], decks[1]);
 
   return decks;
 }

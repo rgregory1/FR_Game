@@ -1,3 +1,7 @@
+/**
+ * this function can be set on a timer and will begin new turns
+ * once eveyone has played
+ */
 function testForNewTurn() {
   let isGameOver = getGameOver();
   if (isGameOver) {
@@ -6,19 +10,6 @@ function testForNewTurn() {
   }
 
   let allPlayerData = getAllLastMoves();
-
-  // let isBreakAway = getBreakAwayStatus()
-  // if (isBreakAway){
-
-  // }
-
-  // let playerData = getPlayerData()
-
-  // // add turn data to each player
-  // playerData.forEach(player => {
-  //   let playerData = getLastMove(player.team)
-  //   player.turn = playerData.turn
-  // })
 
   let currentGameTurn = getCurrentGameTurn();
 
@@ -33,6 +24,11 @@ function testForNewTurn() {
   }
 }
 
+/**
+ * begins a new game turn by incrementing the turn counter
+ * and sending out emails to everone with a summary of the last turn
+ * and a link to play the next one
+ */
 function initiateGameTurn() {
   // add one to game turn
   increaseGameTurn();
@@ -105,7 +101,12 @@ function initiateGameTurn() {
   increaseTurnForFinishedTeams(playerData);
 }
 
-function initiatFirstGameTurn() {
+/**
+ * This is the initial email to start the game
+ * only used once
+ */
+function initiateFirstGameTurn() {
+  // TODO can this be incorporated into something else?
   // add one to game turn
   increaseGameTurn();
 
@@ -132,9 +133,16 @@ function initiatFirstGameTurn() {
   });
 }
 
+/**
+ * this is a reminder email function, at a certain interval it should
+ * track if a player has moved, then check again after time and send message if
+ * a move has still not occured
+ */
 function testForLaggingPlayer() {
+  // TODO this function needs more help to be able to track effectively
   let playerData = getPlayerData();
 
+  // TODO replace this with getAllMoves function
   // add turn data to each player
   playerData.forEach((player) => {
     let playerData = getLastMove(player.team);
@@ -182,24 +190,26 @@ function testForLaggingPlayer() {
 //   { rider: 'BlackRoller', move: 6, draft: 1 },
 //   { rider: 'BlackSprinter', move: 4, draft: 2 } ]
 
+/**
+ * retrieves data from finish table
+ * @returns {array of arrays} - finish data for processing
+ */
 function getFinishData() {
   let finishData = finish.getDataRange().getValues();
   finishData.shift();
   return finishData;
 }
 
-function increaseTurnForFinishedTeams(playerData) {
-  if (playerData === undefined) {
-    playerData = getPlayerData();
-  }
+/**
+ * increments the turn number for each team that has two riders over the
+ * finish line allowing turns to progress
+ */
+function increaseTurnForFinishedTeams() {
+  let allLastMoves = getAllLastMoves();
 
-  let dbData = getDbData();
-
-  playerData.forEach((player) => {
-    let lastMove = getLastMove(player.team, dbData);
-
-    if (lastMove.special.length == 2) {
-      increasePlayerGameTurn(lastMove.team);
+  allLastMoves.forEach((status) => {
+    if (status.special.length == 2) {
+      increasePlayerGameTurn(status.team);
     }
   });
 }

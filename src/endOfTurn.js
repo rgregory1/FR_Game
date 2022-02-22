@@ -1,3 +1,9 @@
+/**
+ * the great grandady of them all function
+ * this is executed after every player has choosen cards
+ * all riders are moved, drafted, and exhausted
+ * end of game and finisher checks are sprinkled in as well
+ */
 function endOfTurn() {
   // remove finished riders
   removeFinishedRiders();
@@ -18,6 +24,10 @@ function endOfTurn() {
   checkForGameOver();
 }
 
+/**
+ * Checks if any riders have passed the finish line, if so
+ * records them to finish table, adds to turnSummary
+ */
 function checkForFinishers() {
   let placements = [];
 
@@ -44,7 +54,7 @@ function checkForFinishers() {
 
   // test each rider to see if they are in a 'finish' square, if so mark
   // mark thier finish position
-  currentPositions.forEach((thisGuy, index) => {
+  currentPositions.forEach((thisGuy) => {
     // test current square for Incline or Cobbles
     let thisCell = trackData[thisGuy.y][thisGuy.x];
     if (thisCell.split("-")[0] == "F") {
@@ -54,9 +64,9 @@ function checkForFinishers() {
       // update deck for placement
       let riderData = thisGuy.rider.split(/(?=[A-Z])/);
 
-      let thisRiderData = getLastMove(riderData[0]);
+      let thisRiderStatus = getLastMove(riderData[0]);
 
-      thisRiderData.deck.forEach((deck) => {
+      thisRiderStatus.deck.forEach((deck) => {
         if (deck.name == riderData[1]) {
           // add place to deck to flag rider as finished
           deck.place = nextAvailablePlace;
@@ -69,10 +79,10 @@ function checkForFinishers() {
       });
 
       // mark rider as finished in db
-      thisRiderData.special.push({ finish: riderData[1] });
+      thisRiderStatus.special.push({ finish: riderData[1] });
 
       // update player db
-      updatePlayerTurn(riderData[0], thisRiderData);
+      updatePlayerTurn(riderData[0], thisRiderStatus);
 
       let pastFinish = thisGuy.x - finishLine;
 
@@ -90,6 +100,13 @@ function checkForFinishers() {
   }
 }
 
+/**
+ *
+ * @param {string} rider
+ * @param {string} pastFinish - spaces past the finish
+ * @param {string} exhaustionCount - for residual exhaustion
+ * @returns {number} lastRow - this is the last row in the place table
+ */
 function addToPlaceTable(rider, pastFinish, exhaustionCount) {
   let lastRow = finish.getLastRow();
 
@@ -104,6 +121,10 @@ function addToPlaceTable(rider, pastFinish, exhaustionCount) {
   return lastRow; // this is the finishing place
 }
 
+/**
+ * checks to see if all riders have finished
+ * @returns {boolean} - is the game over?
+ */
 function checkForGameOver() {
   let isGameOver = false;
 
@@ -122,6 +143,10 @@ function checkForGameOver() {
   return isGameOver;
 }
 
+/**
+ * at the beginning of the movement phase, remove riders past finish
+ * from the track
+ */
 function removeFinishedRiders() {
   // get track data from spreadsheet
   let trackData = track.getDataRange().getValues();

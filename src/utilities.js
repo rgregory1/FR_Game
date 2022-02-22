@@ -4,11 +4,11 @@
  *  @return {Array of Objects} team data from baseGameInfo sheet
  */
 function getPlayerData(team) {
-  let baseGameData = baseGameInfo.getRange(2, 1, 6, 7).getValues();
+  let baseGameData = baseGameInfo.getRange(2, 1, 6, 7).getValues()
 
-  let playerData = [];
+  let playerData = []
 
-  baseGameData.forEach((player) => {
+  baseGameData.forEach(player => {
     if (player[3] !== "") {
       playerData.push({
         line: player[0],
@@ -18,15 +18,15 @@ function getPlayerData(team) {
         tourPoints: player[4] == "" ? 0 : player[4],
         deck1Ex: player[5] == "" ? 0 : player[5],
         deck2Ex: player[6] == "" ? 0 : player[6],
-      });
+      })
     }
-  });
+  })
 
   if (typeof team !== "undefined") {
-    playerData = playerData.filter((x) => x.team == team);
+    playerData = playerData.filter(x => x.team == team)
   }
-  console.log(playerData);
-  return playerData;
+  // console.log(playerData);
+  return playerData
 }
 
 /**
@@ -37,13 +37,13 @@ function getPlayerData(team) {
 function shuffleDeck(deck) {
   // shuffle the cards
   for (let i = deck.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * i);
-    let temp = deck[i];
-    deck[i] = deck[j];
-    deck[j] = temp;
+    let j = Math.floor(Math.random() * i)
+    let temp = deck[i]
+    deck[i] = deck[j]
+    deck[j] = temp
   }
 
-  return deck;
+  return deck
 }
 
 /**
@@ -54,16 +54,16 @@ function shuffleDeck(deck) {
  */
 function getLastMove(team = "Black", dbData) {
   if (typeof dbData == "undefined") {
-    dbData = getDbData();
+    dbData = getDbData()
   }
 
-  let lastMove;
+  let lastMove
 
   for (var i = dbData.length - 1; i >= 0; i--) {
-    console.log(i);
+    // console.log(i);
     if (dbData[i][0] == team) {
-      lastMove = dbData[i];
-      break;
+      lastMove = dbData[i]
+      break
     }
   }
 
@@ -77,8 +77,8 @@ function getLastMove(team = "Black", dbData) {
     hand: JSON.parse(lastMove[4]),
     choice: JSON.parse(lastMove[5]),
     deck: JSON.parse(lastMove[6]),
-  };
-  return lastMoveObj;
+  }
+  return lastMoveObj
 }
 
 /**
@@ -86,19 +86,19 @@ function getLastMove(team = "Black", dbData) {
  * @return {Array of Objects} allMoves - each players turn object in a list
  */
 function getAllLastMoves() {
-  let dbData = getDbData();
-  let playerData = getPlayerData();
-  let allMoves = [];
+  let dbData = getDbData()
+  let playerData = getPlayerData()
+  let allMoves = []
 
   // let reversedDbData = dbData.reverse();
 
-  playerData.forEach((player) => {
-    let status = getLastMove(player.team, dbData);
+  playerData.forEach(player => {
+    let status = getLastMove(player.team, dbData)
 
-    allMoves.push(status);
-  });
+    allMoves.push(status)
+  })
 
-  return allMoves;
+  return allMoves
 }
 
 /**
@@ -115,7 +115,7 @@ function updatePlayerTurn(team = "Black", status) {
     JSON.stringify(status.hand),
     JSON.stringify(status.choice),
     JSON.stringify(status.deck),
-  ]);
+  ])
 }
 
 /**
@@ -123,38 +123,38 @@ function updatePlayerTurn(team = "Black", status) {
  * @return {Object} object - exhaustion and which players have played
  */
 function getExhaustionCounts() {
-  let playerExhaustionCounts = [];
-  let playersPlayed = [];
-  let currentGameTurn = getCurrentGameTurn();
+  let playerExhaustionCounts = []
+  let playersPlayed = []
+  let currentGameTurn = getCurrentGameTurn()
 
-  let allLastMoves = getAllLastMoves();
+  let allLastMoves = getAllLastMoves()
 
-  allLastMoves.forEach((lastMove) => {
-    lastMove.deck.forEach((singleDeck) => {
+  allLastMoves.forEach(lastMove => {
+    lastMove.deck.forEach(singleDeck => {
       let exhaustionCount = [
         ...singleDeck.energyDeck,
         ...singleDeck.recycle,
-      ].filter((x) => x == "2E").length;
+      ].filter(x => x == "2E").length
 
       // test for exhaustion card in choice
-      lastMove.choice.forEach((choiceObj) => {
+      lastMove.choice.forEach(choiceObj => {
         if (choiceObj.rider == singleDeck.name && choiceObj.card == "2E") {
-          ++exhaustionCount;
+          ++exhaustionCount
         }
-      });
+      })
 
       playerExhaustionCounts.push({
         rider: lastMove.team + singleDeck.name,
         exhaustCount: exhaustionCount,
-      });
-    });
+      })
+    })
 
     if (lastMove.turn > currentGameTurn) {
-      playersPlayed.push(lastMove.team);
+      playersPlayed.push(lastMove.team)
     }
-  });
+  })
 
-  return { exhaustion: playerExhaustionCounts, playersPlayed: playersPlayed };
+  return { exhaustion: playerExhaustionCounts, playersPlayed: playersPlayed }
 }
 
 /**
@@ -162,60 +162,83 @@ function getExhaustionCounts() {
  * @return {Array of Arrays} dbData - returns all DB data
  */
 function getDbData() {
-  let dbData = db.getDataRange().getValues();
-  dbData.shift();
+  let dbData = db.getDataRange().getValues()
+  dbData.shift()
 
-  return dbData;
+  return dbData
 }
 
 function increaseGameTurn() {
-  let currentTurn = getCurrentGameTurn();
-  baseGameInfo.getRange("B11").setValue(currentTurn + 1);
+  let currentTurn = getCurrentGameTurn()
+  baseGameInfo.getRange("B11").setValue(currentTurn + 1)
 }
 
 function getCurrentGameTurn() {
-  return baseGameInfo.getRange("B11").getValue();
+  return baseGameInfo.getRange("B11").getValue()
 }
 
 function getGameName() {
-  let gameName = baseGameInfo.getRange("B12").getValue();
-  return gameName;
+  let gameName = baseGameInfo.getRange("B12").getValue()
+  return gameName
 }
 
 function getTrackName() {
-  let trackName = baseGameInfo.getRange("B17").getValue();
-  let raceName = baseGameInfo.getRange("B12").getValue();
-  return { trackName: trackName, raceName: raceName };
+  let trackName = baseGameInfo.getRange("B17").getValue()
+  let raceName = baseGameInfo.getRange("B12").getValue()
+  return { trackName: trackName, raceName: raceName }
 }
 
 /**
  * removes the numbers from the track after setup is complete
  */
 function removeStartNumbers() {
-  let trackData = getTrackData();
+  let trackData = getTrackData()
 
   trackData.forEach((line, i) => {
     line.forEach((cell, x) => {
-      let cellData = cell.split("-");
+      let cellData = cell.split("-")
       if (cellData[0] !== "B" && cellData[1] !== "") {
         if (!isNaN(cellData[1])) {
-          console.log("ready for removal", cellData[1]);
-          track.getRange(i + 1, x + 1).setValue(cellData[0] + "-");
+          console.log("ready for removal", cellData[1])
+          track.getRange(i + 1, x + 1).setValue(cellData[0] + "-")
         }
       }
-    });
-  });
+    })
+  })
 }
 
 function setGameOver() {
-  baseGameInfo.getRange("B15").setValue("Yes");
+  baseGameInfo.getRange("B15").setValue("Yes")
 }
 
 function getGameOver() {
-  let isGameOver = baseGameInfo.getRange("B15").getValue();
+  let isGameOver = baseGameInfo.getRange("B15").getValue()
   if (isGameOver == "Yes") {
-    return true;
+    return true
   } else {
-    return false;
+    return false
   }
+}
+
+/**
+ *  this grabs track data and returns it to the webapp
+ *  the new Date argument is there to ensure that it runs the
+ *  function and grabs new data
+ *  @param {date} howdy - totally arbitrary argument to ensure function fires with new data
+ *  @returns {array of arrays} trackData - all data from track
+ */
+function getTrackData(howdy = new Date()) {
+  SpreadsheetApp.flush()
+  let trackData = track.getDataRange().getValues()
+
+  // console.log(trackData)
+
+  return trackData
+}
+
+/**
+ *  allows me to include additional templates in the webapp page
+ */
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent()
 }
