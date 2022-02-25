@@ -91,13 +91,10 @@ function sendCardChoice(card = "3R", team = "Black", rider = "Roller") {
   // move card to choice and rest of hand to recycle
   let cardIndex = status.hand.hand.indexOf(card)
   status.hand.hand.splice(cardIndex, 1)
-
-  if (status.choice) {
-    status.choice.push({ rider: rider, card: card })
-  } else {
-    status.choice = [{ rider: rider, card: card }]
-  }
-
+  
+  // add chosen card to choice list
+  status.choice.push({ rider: rider, card: card })
+  
   let di = status.deck.findIndex(x => x.name == rider)
 
   status.deck[di].recycle = [...status.deck[di].recycle, ...status.hand.hand]
@@ -111,6 +108,7 @@ function sendCardChoice(card = "3R", team = "Black", rider = "Roller") {
   // increment turn if both cards are choosen
   if (status.choice.length == 2) {
     status.turn = status.turn + 1
+    status.lag = {}
   }
 
   // console.log(status);
@@ -118,7 +116,8 @@ function sendCardChoice(card = "3R", team = "Black", rider = "Roller") {
 
   // if only one car played, return hand for other rider
   if (status.choice.length == 1) {
-    let nextRider = status.deck.findIndex(x => x.name !== rider)
+    let nextRiderIndex = status.deck.findIndex(x => x.name !== rider)
+    let nextRider = status.deck[nextRiderIndex].name
 
     let newHand = returnHand(team, nextRider)
 

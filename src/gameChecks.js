@@ -3,24 +3,24 @@
  * once eveyone has played
  */
 function testForNewTurn() {
-  let isGameOver = getGameOver();
+  let isGameOver = getGameOver()
   if (isGameOver) {
-    console.log("Game Over");
-    return;
+    console.log("Game Over")
+    return
   }
 
-  let allPlayerData = getAllLastMoves();
+  let allPlayerData = getAllLastMoves()
 
-  let currentGameTurn = getCurrentGameTurn();
+  let currentGameTurn = getCurrentGameTurn()
 
   // filter out players who have already positioned for the start
-  let stillToPlay = allPlayerData.filter((x) => x.turn == currentGameTurn);
+  let stillToPlay = allPlayerData.filter(x => x.turn == currentGameTurn)
 
   if (stillToPlay.length == 0) {
-    endOfTurn();
-    initiateGameTurn();
+    endOfTurn()
+    initiateGameTurn()
   } else {
-    console.log("still wating for players");
+    console.log("still wating for players")
   }
 }
 
@@ -31,74 +31,74 @@ function testForNewTurn() {
  */
 function initiateGameTurn() {
   // add one to game turn
-  increaseGameTurn();
+  increaseGameTurn()
 
-  let playerData = getPlayerData();
-  let nextGameTurn = getCurrentGameTurn() + 1;
+  let playerData = getPlayerData()
+  let nextGameTurn = getCurrentGameTurn() + 1
 
   // generate turn report to email to each player
-  let turnReportObject = getLastSummaryLine();
+  let turnReportObject = getLastSummaryLine()
 
-  let turnReportArray = [];
-  let addPlaces = false;
+  let turnReportArray = []
+  let addPlaces = false
 
-  let isGameOver = checkForGameOver();
+  let isGameOver = checkForGameOver()
 
-  turnReportObject.forEach((line) => {
-    let thisLine = [line.rider, line.move];
+  turnReportObject.forEach(line => {
+    let thisLine = [line.rider, line.move]
 
     if ("reduction" in line) {
-      thisLine.push(line.reduction);
-    } else thisLine.push("");
+      thisLine.push(line.reduction)
+    } else thisLine.push("")
 
     if ("draft" in line) {
-      thisLine.push(line.draft);
-    } else thisLine.push("");
+      thisLine.push(line.draft)
+    } else thisLine.push("")
 
     if ("exhaustion" in line) {
-      thisLine.push(line.exhaustion);
-    } else thisLine.push("");
+      thisLine.push(line.exhaustion)
+    } else thisLine.push("")
 
     if ("place" in line) {
-      thisLine.push(line.place);
-      addPlaces = true;
-    } else thisLine.push("");
+      thisLine.push(line.place)
+      addPlaces = true
+    } else thisLine.push("")
 
-    turnReportArray.push(thisLine);
-  });
+    turnReportArray.push(thisLine)
+  })
 
   // get variables for email
-  let gameName = getGameName();
-  let emailTitle = `${gameName} - Play turn ${nextGameTurn}`;
+  let gameName = getGameName()
+  let emailTitle = `${gameName} - Play turn ${nextGameTurn}`
 
-  let finishData = getFinishData();
+  let finishData = getFinishData()
   if (finishData.length > 0) {
-    emailTitle = `${gameName} - A Rider Has Crossed The Finish - Play turn ${nextGameTurn}`;
+    emailTitle = `${gameName} - A Rider Has Crossed The Finish - Play turn ${nextGameTurn}`
   }
 
   if (isGameOver) {
-    emailTitle = `${gameName} - Game Over`;
+    emailTitle = `${gameName} - Game Over`
   }
 
-  playerData.forEach((player) => {
-    let htmlTemplate = HtmlService.createTemplateFromFile("newTurn");
+  playerData.forEach(player => {
+    let htmlTemplate = HtmlService.createTemplateFromFile("newTurn")
 
-    htmlTemplate.player = player;
-    htmlTemplate.turnReport = turnReportArray;
-    htmlTemplate.gameApiLink = gameApiLink;
-    htmlTemplate.nextGameTurn = nextGameTurn;
-    htmlTemplate.isGameOver = isGameOver;
-    htmlTemplate.addPlaces = addPlaces;
-    htmlTemplate.finishData = finishData;
+    htmlTemplate.player = player
+    htmlTemplate.turnReport = turnReportArray
+    htmlTemplate.gameApiLink = gameApiLink
+    htmlTemplate.nextGameTurn = nextGameTurn
+    htmlTemplate.isGameOver = isGameOver
+    htmlTemplate.addPlaces = addPlaces
+    htmlTemplate.finishData = finishData
 
-    let htmlForEmail = htmlTemplate.evaluate().getContent();
+    let htmlForEmail = htmlTemplate.evaluate().getContent()
 
     MailApp.sendEmail(player.email, emailTitle, "", {
       htmlBody: htmlForEmail,
-    });
-  });
+    })
+  })
 
-  increaseTurnForFinishedTeams(playerData);
+  increaseTurnForFinishedTeams(playerData)
 }
 
 /**
@@ -108,19 +108,19 @@ function initiateGameTurn() {
 function initiateFirstGameTurn() {
   // TODO can this be incorporated into something else?
   // add one to game turn
-  increaseGameTurn();
+  increaseGameTurn()
 
-  let gameName = getGameName();
-  let playerData = getPlayerData();
-  let nextGameTurn = getCurrentGameTurn() + 1;
+  let gameName = getGameName()
+  let playerData = getPlayerData()
+  let nextGameTurn = getCurrentGameTurn() + 1
 
-  playerData.forEach((player) => {
+  playerData.forEach(player => {
     let body = `<h2>${player.team} Team Play Round ${nextGameTurn}</h2>
 
     
     Click below to play your cards.
     
-    <a href="${gameApiLink}?color=${player.team}">Play Now</a>`;
+    <a href="${gameApiLink}?color=${player.team}">Play Now</a>`
 
     MailApp.sendEmail(
       player.email,
@@ -129,8 +129,8 @@ function initiateFirstGameTurn() {
       {
         htmlBody: body,
       }
-    );
-  });
+    )
+  })
 }
 
 /**
@@ -139,48 +139,114 @@ function initiateFirstGameTurn() {
  * a move has still not occured
  */
 function testForLaggingPlayer() {
+  // test for game over
+  let isGameOver = getGameOver()
+  if (isGameOver) {
+    return
+  }
+
   // TODO this function needs more help to be able to track effectively
-  let playerData = getPlayerData();
+  let playerData = getPlayerData()
+  let allPlayerMoves = getAllLastMoves(playerData)
 
-  // TODO replace this with getAllMoves function
   // add turn data to each player
-  playerData.forEach((player) => {
-    let playerData = getLastMove(player.team);
-    player.turn = playerData.turn;
-  });
+  allPlayerMoves.forEach(player => {
+    let thisStatus = playerData.find(x => x.team == player.team)
+    player.email = thisStatus.email
+  })
 
-  let currentGameTurn = getCurrentGameTurn();
-  let nextGameTurn = getCurrentGameTurn() + 1;
+  let currentGameTurn = getCurrentGameTurn()
+  let nextGameTurn = getCurrentGameTurn() + 1
 
   // filter out players who have already positioned for the start
-  let stillToPlay = playerData.filter((x) => x.turn == currentGameTurn);
+  let stillToPlay = allPlayerMoves.filter(x => x.turn == currentGameTurn)
 
-  let gameName = getGameName();
+  let gameName = getGameName()
 
+  // process players still to play
   if (stillToPlay.length > 0) {
-    console.log("Still to play: ");
+    console.log(
+      "Still to play: ",
+      stillToPlay.map(x => x.team)
+    )
 
-    stillToPlay.forEach((player) => {
-      console.log(player.team);
+    stillToPlay.forEach(status => {
+      if (JSON.stringify(status.lag) === "{}") {
+        console.log("empty here")
+        status.lag.timeStamp = Utilities.formatDate(
+          new Date(),
+          SpreadsheetApp.getActive().getSpreadsheetTimeZone(),
+          "dd/mm/YYYY hh:mm a"
+        )
+        updatePlayerTurn(status.team, status)
+      } else if ("reminder" in status.lag) {
+        // make turn for the player
+        console.log("make turn")
+        console.log(status.team)
 
-      let body = `<h2>${player.team} Team Play Round ${nextGameTurn}</h2>
+        autoplayTurn(status.team)
 
-      <b>Looks like everyone is waiting on you to play your turn.</b>
+        let body = `<h2>${status.team} Team Autoplayed for ${nextGameTurn}</h2>
 
-      Click below to play your cards.
-      
-      <a href="${gameApiLink}?color=${player.team}">Play Now</a>`;
+          <b>Your turn was played due to inactivity`
 
-      MailApp.sendEmail(
-        player.email,
-        `${gameName} - Play turn ${nextGameTurn} reminder`,
-        "",
-        {
-          htmlBody: body,
-        }
-      );
-    });
+        MailApp.sendEmail(
+          status.email,
+          `${gameName} - Autoplay notification`,
+          "",
+          {
+            htmlBody: body,
+          }
+        )
+      } else {
+        // add reminder and send email reminder
+        console.log("need to add reminder")
+        status.lag.reminder = "x"
+        updatePlayerTurn(status.team, status)
+
+        let body = `<h2>${status.team} Team Play Round ${nextGameTurn}</h2>
+
+            <b>Looks like everyone is waiting on you to play your turn.</b>
+
+            Click below to play your cards.
+            
+            <a href="${gameApiLink}?color=${status.team}">Play Now</a>`
+
+        MailApp.sendEmail(
+          status.email,
+          `${gameName} - Play turn ${nextGameTurn} reminder`,
+          "",
+          {
+            htmlBody: body,
+          }
+        )
+      }
+    })
   }
+
+  // if (stillToPlay.length > 0) {
+
+  //   stillToPlay.forEach((player) => {
+  //     console.log(player.team);
+
+  //     let body = `<h2>${player.team} Team Play Round ${nextGameTurn}</h2>
+
+  //     <b>Looks like everyone is waiting on you to play your turn.</b>
+
+  //     Click below to play your cards.
+
+  //     <a href="${gameApiLink}?color=${player.team}">Play Now</a>`;
+
+  //     MailApp.sendEmail(
+  //       player.email,
+  //       `${gameName} - Play turn ${nextGameTurn} reminder`,
+  //       "",
+  //       {
+  //         htmlBody: body,
+  //       }
+  //     );
+  //   });
+  // }
 }
 
 // [ { rider: 'GreenSprinter', move: 5, draft: 1 },
@@ -191,13 +257,35 @@ function testForLaggingPlayer() {
 //   { rider: 'BlackSprinter', move: 4, draft: 2 } ]
 
 /**
+ * auto-play players turn
+ * @param {string} team - team to autoplay
+ */
+function autoplayTurn(team = "Black") {
+  let status = getLastMove()
+
+  let riders = [status.deck[0].name, status.deck[1].name]
+
+  let firstRiderHand = returnHand(team, riders[0])
+
+  let secondRiderHand = sendCardChoice(
+    firstRiderHand.hand[0],
+    team,
+    firstRiderHand.rider
+  )
+
+  sendCardChoice(secondRiderHand[0], team, secondRiderHand.rider)
+
+  console.log("the end")
+}
+
+/**
  * retrieves data from finish table
  * @returns {array of arrays} - finish data for processing
  */
 function getFinishData() {
-  let finishData = finish.getDataRange().getValues();
-  finishData.shift();
-  return finishData;
+  let finishData = finish.getDataRange().getValues()
+  finishData.shift()
+  return finishData
 }
 
 /**
@@ -205,11 +293,11 @@ function getFinishData() {
  * finish line allowing turns to progress
  */
 function increaseTurnForFinishedTeams() {
-  let allLastMoves = getAllLastMoves();
+  let allLastMoves = getAllLastMoves()
 
-  allLastMoves.forEach((status) => {
+  allLastMoves.forEach(status => {
     if (status.special.length == 2) {
-      increasePlayerGameTurn(status.team);
+      increasePlayerGameTurn(status.team)
     }
-  });
+  })
 }

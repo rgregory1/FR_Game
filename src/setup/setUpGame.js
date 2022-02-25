@@ -69,7 +69,7 @@ function setUpGame() {
   const db = ss.getSheetByName("db") || ss.insert("db");
   db.clear();
   let dbheader = [
-    ["team", "speical", "turn", "phase", "hand", "choice", "deck"],
+    ["team", "speical", "turn", "lag", "phase", "hand", "choice", "deck"],
   ];
   db.getRange(1, 1, 1, dbheader[0].length).setValues(dbheader);
 
@@ -86,6 +86,7 @@ function setUpGame() {
       team.team,
       JSON.stringify([]),
       -1,
+      JSON.stringify({}),
       JSON.stringify([]),
       JSON.stringify({}),
       JSON.stringify([]),

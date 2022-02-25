@@ -73,10 +73,11 @@ function getLastMove(team = "Black", dbData) {
     team: lastMove[0],
     special: JSON.parse(lastMove[1]),
     turn: lastMove[2],
-    phase: JSON.parse(lastMove[3]),
-    hand: JSON.parse(lastMove[4]),
-    choice: JSON.parse(lastMove[5]),
-    deck: JSON.parse(lastMove[6]),
+    lag: JSON.parse(lastMove[3]),
+    phase: JSON.parse(lastMove[4]),
+    hand: JSON.parse(lastMove[5]),
+    choice: JSON.parse(lastMove[6]),
+    deck: JSON.parse(lastMove[7]),
   }
   return lastMoveObj
 }
@@ -85,9 +86,13 @@ function getLastMove(team = "Black", dbData) {
  * get all last moves of each team
  * @return {Array of Objects} allMoves - each players turn object in a list
  */
-function getAllLastMoves() {
+function getAllLastMoves(playerData) {
+  
+  if (playerData === undefined) {
+    playerData = getPlayerData()
+  }
+
   let dbData = getDbData()
-  let playerData = getPlayerData()
   let allMoves = []
 
   // let reversedDbData = dbData.reverse();
@@ -111,6 +116,7 @@ function updatePlayerTurn(team = "Black", status) {
     status.team,
     JSON.stringify(status.special),
     status.turn,
+    JSON.stringify(status.lag),
     JSON.stringify(status.phase),
     JSON.stringify(status.hand),
     JSON.stringify(status.choice),
